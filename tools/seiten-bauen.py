@@ -223,6 +223,13 @@ ORG = {"@context": "https://schema.org", "@type": "Organization", "@id": BASIS +
 
 # ---------------------------------------------------------------- Startseite
 
+def collage(namen):
+    teile = ''.join(f'<img src="img/buch-{n}.webp" alt="" width="302" height="390" class="dreh{i}">' for i, (n, d) in enumerate(namen))
+    return f'<div class="bett collage" aria-hidden="true">{teile}</div>'
+
+
+
+
 START = f'''<main>
 <section class="huelle held">
   <div>
@@ -292,13 +299,14 @@ START = f'''<main>
 <section class="abschnitt"><div class="huelle karten">
   <div>
     <p class="marke">Bücher</p><h2>Malbücher für Klein und Groß</h2>
-    <p class="leise">Robert hat Mal- und Skizzenbücher für Kinder ab 4 Jahren und Mandala-Malbücher mit Affirmationen gestaltet. Alle als Taschenbuch bei Amazon.</p>
+    <p class="leise">Robert und Christopher haben Mal- und Skizzenbücher für Kinder ab 4 Jahren und Mandala-Malbücher mit Affirmationen gestaltet. Alle als Taschenbuch bei Amazon.</p>
     <div class="knoepfe"><a class="zweit" href="buecher.html">Zu den Büchern <span class="pfeil" aria-hidden="true">→</span></a></div>
   </div>
-  <div class="bett">{BUCH_BILD}</div>
+  @@COLLAGE@@
 </div></section>
 </main>'''
 
+START = START.replace('@@COLLAGE@@', collage([('dino-skizzenbuch', -7), ('feen-skizzenbuch', 3), ('reichtum-wohlstand', 9)]))
 seite('index.html', 'BuntwerkStudio – Schallwelle und Wanderroute als 3D-Druck',
       'Personalisierte 3D-Druck-Geschenke aus dem Münsterland: deine Stimme als Schallwellen-Anhänger (Klangform) und deine Wanderroute als 3D-Relief (Wegform). Dazu Malbücher für Kinder und Erwachsene.',
       START, ld=[ORG, {"@context": "https://schema.org", "@type": "WebSite", "name": "BuntwerkStudio", "url": BASIS, "inLanguage": "de-DE",
@@ -514,6 +522,7 @@ BUCHLISTE = [
          gruppe='Erwachsene', farbe='#c9a23f', motiv='mandala', jahr='2025-11-09'),
 ]
 AUTOR = 'Robert Maximilian Maahs'
+AUTOREN = ['Robert Maximilian Maahs', 'Christopher Müller']
 
 
 def umschlag_svg(b):
@@ -565,14 +574,19 @@ def umschlag_svg(b):
             f'{text}{motiv}<text x="200" y="560" text-anchor="middle" font-size="17" fill="#fff" opacity=".85">{AUTOR}</text></svg>')
 
 
+# Echte Umschläge: img/buch-<datei>.webp (von Amazon, 302×390). Fehlt eine Datei, wird ein gezeichneter Umschlag erzeugt.
 for b in BUCHLISTE:
-    with open(os.path.join(ZIEL, 'img', f"buch-{b['datei']}.svg"), 'w', encoding='utf-8') as fh:
-        fh.write(umschlag_svg(b))
+    if os.path.exists(os.path.join(ZIEL, 'img', f"buch-{b['datei']}.webp")):
+        b['bild'], b['bw'], b['bh'] = f"img/buch-{b['datei']}.webp", 302, 390
+    else:
+        with open(os.path.join(ZIEL, 'img', f"buch-{b['datei']}.svg"), 'w', encoding='utf-8') as fh:
+            fh.write(umschlag_svg(b))
+        b['bild'], b['bw'], b['bh'] = f"img/buch-{b['datei']}.svg", 400, 600
 
 
 def buchkarte(b):
     return (f'<article class="buch">'
-            f'<img src="img/buch-{b["datei"]}.svg" alt="Umschlag von „{b["titel"]}“" width="400" height="600" loading="lazy">'
+            f'<img src="{b["bild"]}" alt="Umschlag von „{b["titel"]}“" width="{b["bw"]}" height="{b["bh"]}" loading="lazy">'
             f'<p class="kennung">{b["gruppe"]} · Taschenbuch</p>'
             f'<h3>{b["titel"]}</h3><p>{b["unter"]}</p><p>{b["text"]}</p>'
             f'<div class="knoepfe"><a class="haupt" href="https://www.amazon.de/dp/{b["asin"]}" data-amazon rel="sponsored noopener" target="_blank">Bei Amazon ansehen*</a></div>'
@@ -580,11 +594,13 @@ def buchkarte(b):
 
 
 def buch_ld(b):
-    return {"@type": "Book", "name": f'{b["titel"]}: {b["unter"]}', "author": {"@type": "Person", "name": AUTOR},
+    return {"@type": "Book", "name": f'{b["titel"]}: {b["unter"]}', "author": [{"@type": "Person", "name": n} for n in AUTOREN],
             "bookFormat": "https://schema.org/Paperback", "inLanguage": "de", "datePublished": b['jahr'],
-            "url": f'https://www.amazon.de/dp/{b["asin"]}', "image": BASIS + f'img/buch-{b["datei"]}.svg',
+            "url": f'https://www.amazon.de/dp/{b["asin"]}', "image": BASIS + b['bild'],
             "publisher": {"@id": BASIS + "#organisation"}}
 
+
+COLLAGE = collage([('tiermalbuch', -7), ('adventsmalbuch', 3), ('heilung-selbstliebe', 9)])
 
 kinder = [b for b in BUCHLISTE if b['gruppe'] == 'Kinder']
 gross = [b for b in BUCHLISTE if b['gruppe'] == 'Erwachsene']
@@ -594,10 +610,10 @@ BUECHER = f'''<main>
   <div>
     <p class="marke">Bücher</p>
     <h1>Malbücher und Skizzenbücher</h1>
-    <p class="einleitung">Von Robert Maximilian Maahs: Malbücher und Skizzenbücher für Kinder ab 4 Jahren und Mandala-Malbücher mit Affirmationen für Erwachsene. Alle als Taschenbuch bei Amazon.</p>
+    <p class="einleitung">Von Robert Maximilian Maahs und Christopher Müller: Malbücher und Skizzenbücher für Kinder ab 4 Jahren und Mandala-Malbücher mit Affirmationen für Erwachsene. Alle als Taschenbuch bei Amazon.</p>
     <div class="knoepfe"><a class="haupt" href="#kinder">Für Kinder</a><a class="zweit" href="#erwachsene">Für Erwachsene</a></div>
   </div>
-  <div class="bett">{BUCH_BILD}</div>
+  {COLLAGE}
 </section>
 
 <section class="abschnitt" id="kinder"><div class="huelle">

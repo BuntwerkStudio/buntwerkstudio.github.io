@@ -199,7 +199,7 @@ details p { color: var(--leise); margin: .7rem 0 .9rem; }
 /* Bücher und Empfehlungen */
 .buecher { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: 1rem; margin-top: 1.8rem; }
 .buch { display: flex; flex-direction: column; background: var(--flaeche); border: 1.5px solid var(--linie); border-radius: var(--radius-gross); padding: 1rem; }
-.buch img, .buch .umschlag { width: 100%; height: auto; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 6px; box-shadow: 0 8px 18px rgb(0 0 0 / .18); background: var(--bett); }
+.buch img, .buch .umschlag { width: 100%; height: auto; aspect-ratio: 302 / 390; object-fit: cover; border-radius: 6px; box-shadow: 0 8px 18px rgb(0 0 0 / .18); background: var(--bett); }
 .buch h3 { margin-top: .9rem; }
 .buch p { color: var(--leise); font-size: .95rem; }
 .buch .knoepfe { margin-top: auto; padding-top: 1rem; }
@@ -253,3 +253,14 @@ details p { color: var(--leise); margin: .7rem 0 .9rem; }
 .rot { --farbe: var(--k2); }
 .blau { --farbe: var(--k4); }
 tbody th { font-size: 1rem; letter-spacing: 0; text-transform: none; color: var(--tinte); font-weight: 650; }
+
+/* Umschlag-Collage */
+.collage { display: flex; justify-content: center; align-items: center; gap: 0; padding: 1.5rem; }
+.collage img {
+  width: 30%; height: auto; border-radius: 6px; margin: 0 -2.5%;
+  transform: rotate(var(--d, 0deg)); box-shadow: 0 14px 28px rgb(0 0 0 / .5);
+}
+.collage img:nth-child(2) { z-index: 1; width: 33%; }
+.collage .dreh0 { transform: rotate(-7deg); }
+.collage .dreh1 { transform: rotate(3deg); }
+.collage .dreh2 { transform: rotate(9deg); }
