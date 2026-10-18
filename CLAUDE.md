@@ -10,7 +10,7 @@ Startseite von BuntwerkStudio (Inhaber Robert Maximilian Maahs, Zum Fuchsbau 7, 
 - Alle HTML-Seiten werden von `tools/seiten-bauen.py` erzeugt: `python3 tools/seiten-bauen.py`. Texte, Bücher (`BUCHLISTE`), Empfehlungen (`GRUPPEN`), Links (`KLANGFORM`, `WEGFORM`) dort ändern, nicht in den HTML-Dateien, und danach neu bauen.
 - `css/style.css`: Design von Klangform/Wegform (gleiche Farben, Schrift, Knöpfe, Druckbett). `fonts/`: Fredoka 600 (OFL), lokal.
 - `DRUCK_VERFUEGBAR` in `tools/seiten-bauen.py` folgt `SHOP.druckVerfuegbar` aus Klangform (false = Hinweis „ausverkauft“, nur Druckdatei).
-- `js/partner.js`: Amazon-Partner-Kennung `AMAZON_TAG`. Alle Links mit `data-amazon` bekommen sie angehängt.
+- `js/partner.js`: Amazon-Partner-Kennung `AMAZON_TAG` (Tracking-ID `affiliatesy0e-21`, eingetragen 18.10.2026). Alle Links mit `data-amazon` bekommen sie angehängt.
 - `img/buch-*.webp`: echte Umschläge von Amazon (302×390, lokal im Repository, vom Inhaber freigegeben 18.10.2026). Fehlt eins, zeichnet `tools/seiten-bauen.py` einen Ersatz-Umschlag als SVG. Neues Buch: Eintrag in `BUCHLISTE`, Umschlag als `img/buch-<datei>.webp` ablegen.
 - `img/vorschau.png` (1200×630, Social Media), `img/logo.png`, `robots.txt`, `sitemap.xml`, `404.html`, `.nojekyll`.
 
@@ -21,9 +21,9 @@ Startseite von BuntwerkStudio (Inhaber Robert Maximilian Maahs, Zum Fuchsbau 7, 
 3. Preise nur aus der Konfiguration von Klangform (`js/config.js`) übernehmen. Wegform-Preise sind noch Platzhalter und werden nicht genannt.
 4. Texte auf Deutsch, Leser mit „du“, kurze klare Sätze ohne Werbefloskeln.
 5. Klangform und Wegform werden hier nur verlinkt. Änderungen dort nur in deren Repository (Branch `entwicklung`, siehe `ARBEITSWEISE.md`).
+6. Nach Änderungen an Produkten: Seiten neu bauen, `sitemap.xml` (`lastmod`) prüfen.
 7. Diese Seite kostet keine Netlify-Credits (GitHub Pages): nach lokaler Prüfung direkt auf `main` pushen.
 8. Ändern sich Preise oder Verfügbarkeit in Klangform/Wegform, hier nachziehen (`tools/seiten-bauen.py`, `DRUCK_VERFUEGBAR`) und neu bauen.
-6. Nach Änderungen an Produkten: Seiten neu bauen, `sitemap.xml` (`lastmod`) prüfen.
 
 ## Prüfen
 
