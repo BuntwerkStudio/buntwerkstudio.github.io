@@ -1,5 +1,7 @@
 # Projekt: BuntwerkStudio-Website
 
+> **Zuerst lesen:** `ARBEITSWEISE.md` (gemeinsame Regeln aller BuntwerkStudio-Repositories: Veröffentlichen, Credits, Testumgebung, Zugangsdaten, Chrome). Diese Datei hier beschreibt nur dieses Projekt.
+
 Startseite von BuntwerkStudio (Inhaber Robert Maximilian Maahs, Zum Fuchsbau 7, 48346 Ostbevern, buntwerkstudio@gmail.com, Kleinunternehmer nach § 19 UStG). Verlinkt die beiden 3D-Druck-Konfiguratoren Klangform und Wegform und die Bücher bei Amazon. Robert und Christopher sind keine Webentwickler: Schritte, die sie selbst ausführen müssen, als nummerierte Liste mit genauen Klickpfaden.
 
 ## Aufbau
@@ -18,7 +20,9 @@ Startseite von BuntwerkStudio (Inhaber Robert Maximilian Maahs, Zum Fuchsbau 7, 
 2. Jeder Amazon-Link: `data-amazon`, `rel="sponsored noopener"`, Sternchen `*` am Linktext. Der Hinweis „Als Amazon-Partner verdienen wir an qualifizierten Verkäufen.“ bleibt im Fuß jeder Seite.
 3. Preise nur aus der Konfiguration von Klangform (`js/config.js`) übernehmen. Wegform-Preise sind noch Platzhalter und werden nicht genannt.
 4. Texte auf Deutsch, Leser mit „du“, kurze klare Sätze ohne Werbefloskeln.
-5. Klangform und Wegform werden hier nur verlinkt, ihre Repositories nicht ändern.
+5. Klangform und Wegform werden hier nur verlinkt. Änderungen dort nur in deren Repository (Branch `entwicklung`, siehe `ARBEITSWEISE.md`).
+7. Diese Seite kostet keine Netlify-Credits (GitHub Pages): nach lokaler Prüfung direkt auf `main` pushen.
+8. Ändern sich Preise oder Verfügbarkeit in Klangform/Wegform, hier nachziehen (`tools/seiten-bauen.py`, `DRUCK_VERFUEGBAR`) und neu bauen.
 6. Nach Änderungen an Produkten: Seiten neu bauen, `sitemap.xml` (`lastmod`) prüfen.
 
 ## Prüfen
