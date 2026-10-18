@@ -7,6 +7,9 @@ BASIS = 'https://buntwerkstudio.github.io/'
 KLANGFORM = 'https://klangform.netlify.app/'
 WEGFORM = 'https://tracks-and-trails.netlify.app/'
 STAND = '18.10.2026'
+# Wie SHOP.druckVerfuegbar in Klangform (js/config.js). False = gedruckte Teile ausverkauft, nur STL-Datei bestellbar.
+DRUCK_VERFUEGBAR = False
+HINWEIS_AUSVERKAUFT = '' if DRUCK_VERFUEGBAR else '<div class="kasten"><p><strong>Gerade ausverkauft:</strong> Fertig gedruckte Teile können wir im Moment nicht liefern. Die Druckdatei (STL) zum Selbstdrucken bekommst du weiter für 2 € per E-Mail.</p></div>'
 
 # ---------------------------------------------------------------- Grafiken
 
@@ -255,7 +258,7 @@ START = f'''<main>
       <div class="karte-text">
         <p class="marke">Klangform</p>
         <h3>Deine Stimme als Schlüsselanhänger, Schmuck oder Aufsteller</h3>
-        <p>Nimm ein „Ich liebe dich“, ein Lachen oder einen Herzschlag auf. Daraus wird ein massives Teil in der Form deiner Schallwelle. Ab <span class="preis">6 €</span>.</p>
+        <p>Nimm ein „Ich liebe dich“, ein Lachen oder einen Herzschlag auf. Daraus wird ein massives Teil in der Form deiner Schallwelle. Ab <span class="preis">6 €</span>.{'' if DRUCK_VERFUEGBAR else ' Gedruckte Teile sind gerade ausverkauft, die Druckdatei gibt es für 2 €.'}</p>
         <div class="knoepfe">
           <a class="haupt" href="{KLANGFORM}" rel="noopener">Klangform gestalten <span class="pfeil" aria-hidden="true">→</span></a>
           <a class="zweit" href="schallwelle-anhaenger.html">Mehr erfahren</a>
@@ -319,7 +322,7 @@ K_FRAGEN = [
     ('Kann ich eine Sprachnachricht oder ein Video verwenden?', 'Ja. Du kannst statt einer Aufnahme eine Audio- oder Videodatei hochladen, zum Beispiel eine gespeicherte Sprachnachricht oder ein Video vom Ultraschall. Danach wählst du den Ausschnitt.'),
     ('Wird meine Aufnahme hochgeladen?', 'Nein. Die Aufnahme wird nur in deinem Browser ausgewertet. Aus ihr entsteht eine Reihe von Zahlen für die Form. Aus diesen Zahlen lässt sich der Ton nicht wiederherstellen.'),
     ('Was kostet ein Schallwellen-Anhänger?', 'Ein Schlüsselanhänger kostet je nach Größe 7 bis 9 €, ein Kettenanhänger 7 €, Christbaumschmuck ab 6 €. Der Versand in Deutschland kostet 2,95 €. Alle Preise sind Endpreise.'),
-    ('Wie lange dauert die Lieferung?', 'Wir drucken dein Teil und verschicken es innerhalb von 7 Tagen nach Zahlungseingang.'),
+    ('Wie lange dauert die Lieferung?', 'Wir drucken dein Teil und verschicken es innerhalb von 7 Tagen nach Zahlungseingang.' + ('' if DRUCK_VERFUEGBAR else ' Gerade sind gedruckte Teile ausverkauft. Die Druckdatei kommt nach Zahlungseingang per E-Mail.')),
     ('Ist eine Kette oder ein Band dabei?', 'Nein. Kettenanhänger kommen ohne Kette, Lesezeichen und Christbaumschmuck ohne Band. Passende Ketten, Bänder und Schlüsselringe findest du auf unserer Seite mit Empfehlungen.'),
     ('Kann ich selbst drucken?', 'Ja. Du kannst statt des gedruckten Teils die STL-Datei für 2 € bestellen und sie auf deinem eigenen 3D-Drucker drucken.'),
 ]
@@ -345,6 +348,7 @@ KLANG = f'''<main>
       <a class="haupt" href="{KLANGFORM}" rel="noopener">Jetzt Schallwelle gestalten <span class="pfeil" aria-hidden="true">→</span></a>
       <a class="zweit" href="#preise">Preise ansehen</a>
     </div>
+    {HINWEIS_AUSVERKAUFT}
   </div>
   <div class="bett">{KLANG_BILD}<p class="unterschrift">Schlüsselanhänger, Form Balken. Jede Welle ist einzigartig.</p></div>
 </section>
@@ -375,6 +379,7 @@ KLANG = f'''<main>
     <thead><tr><th scope="col">Produkt</th><th scope="col">Größe</th><th scope="col">Preis</th><th scope="col">Details</th></tr></thead>
     <tbody>{''.join(f'<tr><th scope="row">{a}</th><td>{b}</td><td class="preis">{c}</td><td>{d}</td></tr>' for a, b, c, d in PRODUKTE_K)}</tbody>
   </table></div>
+  {HINWEIS_AUSVERKAUFT}
   <div class="knoepfe"><a class="haupt" href="{KLANGFORM}" rel="noopener">Zu Klangform <span class="pfeil" aria-hidden="true">→</span></a></div>
 </div></section>
 
@@ -397,7 +402,7 @@ seite('schallwelle-anhaenger.html', 'Schallwelle als Schlüsselanhänger – per
                   "image": BASIS + "img/vorschau.png", "brand": {"@type": "Brand", "name": "Klangform"}, "category": "Personalisierte Geschenke",
                   "material": "PLA", "manufacturer": {"@id": BASIS + "#organisation"},
                   "offers": {"@type": "AggregateOffer", "priceCurrency": "EUR", "lowPrice": "6.00", "highPrice": "15.90", "offerCount": "7",
-                             "availability": "https://schema.org/InStock", "url": KLANGFORM,
+                             "availability": "https://schema.org/InStock" if DRUCK_VERFUEGBAR else "https://schema.org/OutOfStock", "url": KLANGFORM,
                              "seller": {"@id": BASIS + "#organisation"}}},
                  fragen_ld(K_FRAGEN)])
 

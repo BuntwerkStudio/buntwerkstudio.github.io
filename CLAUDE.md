@@ -7,6 +7,7 @@ Startseite von BuntwerkStudio (Inhaber Robert Maximilian Maahs, Zum Fuchsbau 7, 
 - Statische Seite auf GitHub Pages, Adresse https://buntwerkstudio.github.io/ (Repository `BuntwerkStudio/buntwerkstudio.github.io`, öffentlich). Jeder Push auf `main` ist sofort online.
 - Alle HTML-Seiten werden von `tools/seiten-bauen.py` erzeugt: `python3 tools/seiten-bauen.py`. Texte, Bücher (`BUCHLISTE`), Empfehlungen (`GRUPPEN`), Links (`KLANGFORM`, `WEGFORM`) dort ändern, nicht in den HTML-Dateien, und danach neu bauen.
 - `css/style.css`: Design von Klangform/Wegform (gleiche Farben, Schrift, Knöpfe, Druckbett). `fonts/`: Fredoka 600 (OFL), lokal.
+- `DRUCK_VERFUEGBAR` in `tools/seiten-bauen.py` folgt `SHOP.druckVerfuegbar` aus Klangform (false = Hinweis „ausverkauft“, nur Druckdatei).
 - `js/partner.js`: Amazon-Partner-Kennung `AMAZON_TAG`. Alle Links mit `data-amazon` bekommen sie angehängt.
 - `img/buch-*.webp`: echte Umschläge von Amazon (302×390, lokal im Repository, vom Inhaber freigegeben 18.10.2026). Fehlt eins, zeichnet `tools/seiten-bauen.py` einen Ersatz-Umschlag als SVG. Neues Buch: Eintrag in `BUCHLISTE`, Umschlag als `img/buch-<datei>.webp` ablegen.
 - `img/vorschau.png` (1200×630, Social Media), `img/logo.png`, `robots.txt`, `sitemap.xml`, `404.html`, `.nojekyll`.
