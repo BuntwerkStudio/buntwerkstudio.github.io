@@ -17,5 +17,5 @@ Status: `[ ]` offen, `[x]` erledigt. So wird die Liste abgearbeitet: `README.md`
 - [ ] **B1 Bestätigungs-Tag der Search Console einbauen** (erst nach A3): Tag in `tools/seiten-bauen.py` in den Kopf von `index.html`, neu bauen, pushen. Danach Robert sagen: in der Search Console „Bestätigen“ klicken, unter „Sitemaps“ `sitemap.xml` einreichen.
 - [ ] **B2 Eigene Domain einrichten** (erst nach A5): `CNAME`, Canonical-Adressen, `sitemap.xml`, `robots.txt`, Impressum, Datenschutz, Links in Klangform und Wegform.
 - [ ] **B3 Neue Adresse überall eintragen** (erst nach A7): Website, Klangform und Wegform (Impressum, AGB, Datenschutz, Widerruf, Bestellbestätigungen in `js/kauf.js`, `ARBEITSWEISE.md`). Klangform/Wegform nur auf `entwicklung`, dann fragen, ob veröffentlicht werden soll.
-- [ ] **B4 Rücklink im Fuß von Klangform und Wegform** auf https://buntwerkstudio.github.io/ (auf `entwicklung`, mit der nächsten Veröffentlichung live).
+- [x] **B4 Rücklink im Fuß von Klangform und Wegform** (19.10.2026 erledigt, liegt auf `entwicklung`, kommt mit der nächsten Veröffentlichung live; dazu die BuntwerkStudio-Kopfzeile oben) auf https://buntwerkstudio.github.io/ (auf `entwicklung`, mit der nächsten Veröffentlichung live).
 - [ ] **B5 Neue Bücher** einbauen, sobald Robert Titel nennt: Umschlag und ASIN aus dem KDP-Bücherregal (Chrome), Eintrag in `BUCHLISTE`, neu bauen.
