@@ -93,7 +93,7 @@ Arbeite die Aufgaben ab. Lies zuerst ARBEITSWEISE.md, CLAUDE.md und in der READM
 Die gleichen Punkte stehen mit Status in `AUFGABEN.md`.
 
 1. **Amazon-Partner-ID:** erledigt (18.10.2026, `affiliatesy0e-21` in `js/partner.js`).
-2. **Website im PartnerNet hinterlegen:** partnernet.amazon.de → Konto → „Konto-Einstellungen“ → „Websites und mobile Apps bearbeiten“ → `https://buntwerkstudio.github.io` hinzufügen. Amazon prüft das Konto erst nach den ersten 3 Verkäufen innerhalb von 180 Tagen.
+2. **Website im PartnerNet hinterlegen:** erledigt (19.10.2026). partnernet.amazon.de → Konto → „Konto-Einstellungen“ → „Websites und mobile Apps bearbeiten“ → `https://buntwerkstudio.github.io` hinzufügen. Amazon prüft das Konto erst nach den ersten 3 Verkäufen innerhalb von 180 Tagen.
 3. **Google Search Console:** search.google.com/search-console → „Property hinzufügen“ → URL-Präfix `https://buntwerkstudio.github.io/` → Bestätigung per HTML-Tag (Claude baut den Tag ein) → danach „Sitemaps“ → `sitemap.xml` einreichen. Gleiches bei Bing Webmaster Tools (Import aus Google geht mit einem Klick).
 4. **Zurückverlinken:** In Klangform und Wegform im Fuß einen Link auf https://buntwerkstudio.github.io/ setzen, in den KDP-Büchern (Impressumsseite) und auf der Amazon-Autorenseite (author.amazon.de) ebenfalls. Links von euren eigenen Seiten helfen Google, die Seite schnell zu finden.
 5. **Neue Bücher:** Neue Titel aus dem KDP-Bücherregal Claude nennen. Claude holt Umschlag und ASIN und baut sie ein.
