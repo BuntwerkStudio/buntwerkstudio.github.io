@@ -4,5 +4,6 @@ Bevor du etwas änderst, lies:
 
 1. `ARBEITSWEISE.md` – gemeinsame Regeln für alle BuntwerkStudio-Repositories (Veröffentlichen nur auf ausdrückliche Ansage, Netlify-Credits, Testumgebung, Zugangsdaten, Klangform und Wegform gleich halten).
 2. `CLAUDE.md` – Aufbau und feste Regeln dieses Projekts.
+3. `README.md`, Abschnitt „Aufgaben abarbeiten“ – so wird `AUFGABEN.md` abgearbeitet, sobald jemand „Aufgaben“ sagt.
 
 Halte beide Dateien aktuell, sobald sich ein Ablauf ändert (siehe `ARBEITSWEISE.md`, Abschnitt 7).

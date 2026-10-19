@@ -1,6 +1,6 @@
 # Projekt: BuntwerkStudio-Website
 
-> **Zuerst lesen:** `ARBEITSWEISE.md` (gemeinsame Regeln aller BuntwerkStudio-Repositories: Veröffentlichen, Credits, Testumgebung, Zugangsdaten, Chrome). Diese Datei hier beschreibt nur dieses Projekt.
+> **Zuerst lesen:** `ARBEITSWEISE.md` (gemeinsame Regeln aller BuntwerkStudio-Repositories: Veröffentlichen, Credits, Testumgebung, Zugangsdaten, Chrome). Diese Datei hier beschreibt nur dieses Projekt. Sagt jemand „Aufgaben“: `README.md`, Abschnitt „Aufgaben abarbeiten“, Schritt 1 bis 7 befolgen.
 
 Startseite von BuntwerkStudio (Inhaber Robert Maximilian Maahs, Zum Fuchsbau 7, 48346 Ostbevern, buntwerkstudio@gmail.com, Kleinunternehmer nach § 19 UStG). Verlinkt die beiden 3D-Druck-Konfiguratoren Klangform und Wegform und die Bücher bei Amazon. Robert und Christopher sind keine Webentwickler: Schritte, die sie selbst ausführen müssen, als nummerierte Liste mit genauen Klickpfaden.
 
