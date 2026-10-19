@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Erzeugt die statischen Seiten für buntwerkstudio.github.io (einmalig, Ergebnis wird committet)."""
-import json, math, os, random
+import json, math, os, random, tempfile
 
 ZIEL = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASIS = 'https://buntwerkstudio.github.io/'
@@ -413,7 +413,6 @@ W_FRAGEN = [
     ('Woher kommt das Gelände?', 'Aus weltweiten Höhendaten (AWS Terrain Tiles). Dein Relief zeigt Berge und Täler rund um deine Route, nicht nur die Linie.'),
     ('Was ist der Unterschied zwischen Basis und Premium?', 'Basis: Gelände in einer Farbe, die Route als eigenes rotes Teil zum Einstecken. Premium: Gelände in 2 bis 4 Höhenstufen von Grün bis Weiß, wahlweise als Schneekappe, Herbst oder Wald.'),
     ('Wie groß ist das Relief?', 'Rund, eckig oder sechseckig mit 60, 100 oder 150 mm. Dazu gibt es eine Grundplatte mit Titel, Datum, Zeit, Kilometern, Höhenmetern und auf Wunsch dem Höhenprofil.'),
-    ('Wofür ist die NFC-Tasche?', 'Ohne Grundplatte hat das Relief unten eine Tasche für einen runden NFC-Sticker (bis 26 mm). Du beschreibst den Sticker mit dem Link zu deiner Aktivität oder deinem Fotoalbum. Ein Tippen mit dem Handy öffnet ihn.'),
     ('Verlässt meine Route mein Gerät?', 'Deine Datei bleibt in deinem Browser. In die Bestellung kommt nur eine vereinfachte Route im Bestellcode, damit wir das Modell drucken können.'),
     ('Gibt es auch einen Anhänger?', 'Ja. Der Anhänger (50 mm) zeigt deine Route, hat oben eine Öse und auf der Rückseite Name und Zeit.'),
 ]
@@ -480,10 +479,6 @@ WEG = f'''<main>
     <thead><tr><th scope="col">App</th><th scope="col">So geht es</th></tr></thead>
     <tbody>{''.join(f'<tr><th scope="row">{a}</th><td>{b}</td></tr>' for a, b in EXPORT)}</tbody>
   </table></div>
-  <div class="kasten">
-    <p><strong>Tipp für die NFC-Tasche:</strong> Ein runder NFC-Sticker (NTAG215, 25 mm) passt in die Tasche unter dem Relief. Mit einer kostenlosen NFC-App schreibst du den Link zu deiner Aktivität darauf.</p>
-    <div class="knoepfe">{partnerlink(amazon_suche('NFC Sticker NTAG215 25mm rund'), 'NFC-Sticker bei Amazon')}</div>
-  </div>
 </div></section>
 
 <section class="abschnitt"><div class="huelle">
@@ -494,7 +489,7 @@ WEG = f'''<main>
 </main>'''
 
 seite('wanderroute-3d-relief.html', 'Wanderroute als 3D-Relief – GPX in 3D drucken | Wegform',
-      'Deine Wanderung, Radtour oder dein Marathon als 3D-gedrucktes Relief mit echtem Gelände. GPX oder FIT hochladen, gestalten, bestellen. Mit Grundplatte, Höhenprofil und NFC-Tasche.',
+      'Deine Wanderung, Radtour oder dein Marathon als 3D-gedrucktes Relief mit echtem Gelände. GPX oder FIT hochladen, gestalten, bestellen. Mit Grundplatte und Höhenprofil.',
       WEG, ld=[kruemel(('index.html', 'Start'), ('wanderroute-3d-relief.html', 'Wegform')), fragen_ld(W_FRAGEN)])
 
 # ---------------------------------------------------------------- Bücher
@@ -650,7 +645,6 @@ GRUPPEN = [
         ('Ohrhaken', 'Für die Ohrringe, aus hautverträglichem Material.', 'Ohrhaken Titan hypoallergen'),
     ]),
     ('Zu deinem Wegform-Relief', 'gruen', 'Damit dein Relief noch mehr erzählt:', [
-        ('NFC-Sticker (NTAG215, 25 mm)', 'Passt in die Tasche unter dem Relief. Ein Tippen öffnet deine Aktivität.', 'NFC Sticker NTAG215 25mm rund'),
         ('Wandregal oder Bilderleiste', 'Zum Aufstellen von Relief und Grundplatte.', 'Bilderleiste Holz 60cm'),
         ('Medaillenhalter', 'Für Läufer: Medaille und Wegform-Anhänger an einem Platz.', 'Medaillenhalter Laufen'),
     ]),
@@ -687,7 +681,7 @@ EMPF = f'''<main>
 </main>'''
 
 seite('empfehlungen.html', 'Zubehör für Schallwellen-Anhänger und 3D-Relief | BuntwerkStudio',
-      'Ketten, Schlüsselringe, Bänder, NFC-Sticker und Filament: Zubehör, das zu den 3D-Drucken von Klangform und Wegform passt.',
+      'Ketten, Schlüsselringe, Bänder, Bilderleisten und Filament: Zubehör, das zu den 3D-Drucken von Klangform und Wegform passt.',
       EMPF, ld=[kruemel(('index.html', 'Start'), ('empfehlungen.html', 'Empfehlungen'))])
 
 # ---------------------------------------------------------------- Impressum
@@ -783,6 +777,6 @@ with open(os.path.join(ZIEL, 'sitemap.xml'), 'w') as f:
     f.write('</urlset>\n')
 
 # Bild für die Vorschau (SVG) – wird in PNG umgewandelt
-with open('/tmp/held.svg', 'w') as f:
+with open(os.path.join(tempfile.gettempdir(), 'held.svg'), 'w') as f:
     f.write(HELD_BILD.replace('<svg ', '<svg width="1000" height="800" ', 1))
 print('fertig')
