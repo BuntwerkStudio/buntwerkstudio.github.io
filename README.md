@@ -9,7 +9,8 @@ Website von BuntwerkStudio: https://buntwerkstudio.github.io/
 | `wanderroute-3d-relief.html` | Wegform: Produkte, GPX-Anleitung, Fragen | Wanderroute als 3D-Relief, GPX 3D drucken, Geschenk Wanderer, Marathon |
 | `buecher.html` | 6 Taschenbücher bei Amazon | Malbuch Kinder, Adventsmalbuch, Mandala Affirmationen |
 | `empfehlungen.html` | Zubehör als Amazon-Partnerlinks | Kette, Schlüsselring, NFC-Sticker, Filament |
-| `impressum.html`, `datenschutz.html` | Rechtliches | – |
+| `impressum.html`, `datenschutz.html` | Rechtliches (nur Deutsch) | – |
+| `en/index.html`, `en/sound-wave-keychain.html`, `en/hiking-route-3d-relief.html`, `en/books.html`, `en/recommendations.html` | Englische Fassungen (seit 24.10.2026, B7), Schalter „DE \| EN“ in der Kopfzeile | 3D printed gift, sound wave keychain, hiking route 3D relief, GPX 3D print |
 
 ## Aufgaben abarbeiten (Anleitung für Claude Code)
 

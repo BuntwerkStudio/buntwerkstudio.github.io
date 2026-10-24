@@ -264,3 +264,47 @@ tbody th { font-size: 1rem; letter-spacing: 0; text-transform: none; color: var(
 .collage .dreh0 { transform: rotate(-7deg); }
 .collage .dreh1 { transform: rotate(3deg); }
 .collage .dreh2 { transform: rotate(9deg); }
+
+/* ---------- Hell/Dunkel-Schalter in der Kopfzeile (js/thema.js, Website, Klangform B12, Wegform B18) ---------- */
+.kopfzeile { position: relative; }
+.kopfzeile .menue { margin-left: auto; }
+.thema-knopf {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  width: 2.4rem; height: 2.4rem; margin: 0; padding: 0; border-radius: 999px;
+  border: 1.5px solid var(--linie); background: transparent; color: var(--tinte); cursor: pointer;
+}
+.thema-knopf svg { width: 1.2rem; height: 1.2rem; }
+.thema-knopf:hover { background: var(--flaeche); }
+.thema-knopf:focus-visible { outline: 3px solid var(--aktion); outline-offset: 2px; }
+@media (max-width: 640px) {
+  .kopfzeile .menue { margin-left: -.8rem; }
+  .thema-knopf { position: absolute; top: .75rem; right: clamp(1rem, 3vw, 2.5rem); }
+  .kopfzeile .wortmarke { margin-right: 3rem; }
+}
+@media print { .thema-knopf { display: none; } }
+
+/* ---------- Sprachwechsel DE | EN in der Kopfzeile (js/sprache.js, Aufgabe B7) ---------- */
+.sprache { flex: none; display: inline-flex; align-items: center; font-weight: 600; font-size: .9rem; }
+.sprache span { color: var(--linie); }
+.sprache a { text-decoration: none; color: var(--leise); padding: .45rem .45rem; border-radius: 999px; }
+.sprache a[aria-current] { color: var(--tinte); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: .25em; }
+.sprache a:hover { background: var(--flaeche); }
+.sprache a:focus-visible { outline: 3px solid var(--aktion); outline-offset: 2px; }
+.sprach-hinweis {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem;
+  background: var(--flaeche); border: 1.5px solid var(--linie); border-radius: var(--radius-klein);
+  padding: .6rem .8rem .6rem 1rem; margin-bottom: .6rem;
+}
+.sprach-hinweis p { margin: 0; flex: 1 1 14rem; }
+.sprach-hinweis .zweit { padding: .35rem .9rem; }
+.sprach-zu {
+  flex: none; width: 2.2rem; height: 2.2rem; border-radius: 999px; border: 1.5px solid var(--linie);
+  background: transparent; color: var(--tinte); font: inherit; font-size: 1.2rem; line-height: 1; cursor: pointer;
+}
+.sprach-zu:hover { background: var(--grund); }
+.sprach-zu:focus-visible { outline: 3px solid var(--aktion); outline-offset: 2px; }
+@media (max-width: 640px) {
+  .sprache { position: absolute; top: .75rem; height: 2.4rem; right: calc(clamp(1rem, 3vw, 2.5rem) + 2.9rem); }
+  .kopfzeile .wortmarke { margin-right: 8rem; }
+}
+@media print { .sprache, .sprach-hinweis { display: none; } }
