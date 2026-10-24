@@ -170,6 +170,7 @@ def seite(datei, titel, beschreibung, inhalt, ld=None, index=True, og_typ='websi
   <meta name="theme-color" content="#273134">
   <link rel="icon" href="{FAVICON}">
   <link rel="preload" href="fonts/fredoka-600.woff" as="font" type="font/woff" crossorigin>
+  <script src="js/thema.js"></script>
   <link rel="stylesheet" href="css/style.css">
   {lds}
 </head>
