@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Erzeugt die statischen Seiten für buntwerkstudio.github.io (einmalig, Ergebnis wird committet)."""
-import json, math, os, random, tempfile
+import json, math, os, posixpath, random, tempfile
 
 ZIEL = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASIS = 'https://buntwerkstudio.github.io/'
 KLANGFORM = 'https://klangform.netlify.app/'
 WEGFORM = 'https://tracks-and-trails.netlify.app/'
 STAND = '18.10.2026'
+GEAENDERT = '2026-10-24'   # lastmod in sitemap.xml
 # Wie SHOP.druckVerfuegbar in Klangform (js/config.js). False = gedruckte Teile ausverkauft, nur STL-Datei bestellbar.
 DRUCK_VERFUEGBAR = False
 HINWEIS_AUSVERKAUFT = '' if DRUCK_VERFUEGBAR else '<div class="kasten"><p><strong>Gerade ausverkauft:</strong> Fertig gedruckte Teile können wir im Moment nicht liefern. Die Druckdatei (STL) zum Selbstdrucken bekommst du weiter für 2 € per E-Mail.</p></div>'
@@ -111,12 +112,49 @@ BUCH_BILD = svg(buch(110, 70, 130, 190, '#b8312f', -6) + buch(260, 80, 130, 190,
 
 MENUE = [('index.html', 'Start'), ('schallwelle-anhaenger.html', 'Klangform'), ('wanderroute-3d-relief.html', 'Wegform'),
          ('buecher.html', 'Bücher'), ('empfehlungen.html', 'Empfehlungen')]
+MENUE_EN = [('en/index.html', 'Home'), ('en/sound-wave-keychain.html', 'Klangform'), ('en/hiking-route-3d-relief.html', 'Wegform'),
+            ('en/books.html', 'Books'), ('en/recommendations.html', 'Recommendations')]
+
+# Englische Seiten (Aufgabe B7 = Klangform B13 = Wegform B19, entschieden 24.10.2026): nur die Website, eigene Adressen unter /en/.
+# Rechtstexte gibt es nur auf Deutsch; der Schalter führt dort zur englischen Startseite.
+EN = {'index.html': 'en/index.html', 'schallwelle-anhaenger.html': 'en/sound-wave-keychain.html',
+      'wanderroute-3d-relief.html': 'en/hiking-route-3d-relief.html', 'buecher.html': 'en/books.html', 'empfehlungen.html': 'en/recommendations.html'}
+DE = {v: k for k, v in EN.items()}
+
+
+def englisch(datei):
+    return datei.startswith('en/')
+
+
+def adresse(datei):
+    """Öffentliche Adresse einer Seite (Startseiten ohne index.html)."""
+    return BASIS + (datei[:-len('index.html')] if datei.endswith('index.html') else datei)
+
+
+def rel(von, nach):
+    """Relativer Link von Seite „von“ zu Seite „nach“ (beide relativ zum Repository)."""
+    p = posixpath.relpath(nach, posixpath.dirname(von) or '.')
+    if p == 'index.html' or p.endswith('/index.html'):
+        p = p[:-len('index.html')] or './'
+    return p
+
+
+def sprachschalter(datei):
+    """„DE | EN“ in der Kopfzeile, führt zur gleichen Seite in der anderen Sprache (js/sprache.js merkt die Wahl)."""
+    en = englisch(datei)
+    ziel = {'de': DE.get(datei, 'index.html') if en else datei, 'en': datei if en else EN.get(datei, 'en/index.html')}
+    teile = [f'<a href="{rel(datei, ziel[s])}" lang="{s}" hreflang="{s}" data-sprache="{s}" title="{t}"'
+             f'{" aria-current=\"true\"" if (s == "en") == en else ""}>{s.upper()}</a>'
+             for s, t in (('de', 'Deutsch'), ('en', 'English'))]
+    return f'<nav class="sprache" aria-label="Sprache / Language">{teile[0]}<span aria-hidden="true">|</span>{teile[1]}</nav>'
 
 
 def kopf(datei):
-    links = ''.join(f'<a href="{d if d != "index.html" else "./"}"{" aria-current=\"page\"" if d == datei else ""}>{n}</a>' for d, n in MENUE)
-    return (f'<header class="huelle kopfzeile"><a class="wortmarke" href="./" aria-label="BuntwerkStudio – Startseite">{LOGO}'
-            f'<span>Buntwerk<b>Studio</b></span></a><nav class="menue" aria-label="Hauptmenü">{links}</nav></header>')
+    en = englisch(datei)
+    links = ''.join(f'<a href="{rel(datei, d)}"{" aria-current=\"page\"" if d == datei else ""}>{n}</a>' for d, n in (MENUE_EN if en else MENUE))
+    start = rel(datei, 'en/index.html' if en else 'index.html')
+    return (f'<header class="huelle kopfzeile"><a class="wortmarke" href="{start}" aria-label="BuntwerkStudio – {"Home" if en else "Startseite"}">{LOGO}'
+            f'<span>Buntwerk<b>Studio</b></span></a><nav class="menue" aria-label="{"Main menu" if en else "Hauptmenü"}">{links}</nav>{sprachschalter(datei)}</header>')
 
 
 FUSS = f'''<footer class="fuss"><div class="huelle">
@@ -141,13 +179,42 @@ FUSS = f'''<footer class="fuss"><div class="huelle">
   <p class="klein">© 2026 BuntwerkStudio · Inhaber Robert Maximilian Maahs · Kleinunternehmer nach § 19 UStG</p>
 </div></footer>'''
 
+FUSS_EN = f'''<footer class="fuss"><div class="huelle">
+  <div class="fuss-raster">
+    <div><a class="wortmarke" href="./">{LOGO}<span>Buntwerk<b>Studio</b></span></a>
+      <p>3D-printed keepsakes and books from Ostbevern, Germany.</p></div>
+    <div><h2>3D printing</h2><ul>
+      <li><a href="sound-wave-keychain.html">Klangform: sound wave</a></li>
+      <li><a href="hiking-route-3d-relief.html">Wegform: hiking route</a></li>
+      <li><a href="{KLANGFORM}" rel="noopener" hreflang="de">Design with Klangform (German)</a></li>
+      <li><a href="{WEGFORM}" rel="noopener" hreflang="de">Design with Wegform (German)</a></li></ul></div>
+    <div><h2>More</h2><ul>
+      <li><a href="books.html">Books</a></li>
+      <li><a href="recommendations.html">Recommendations</a></li>
+      <li><a href="mailto:buntwerkstudio@gmail.com">Send us an email</a></li></ul></div>
+    <div><h2>Legal</h2><ul>
+      <li><a href="../impressum.html" hreflang="de">Legal notice (German)</a></li>
+      <li><a href="../datenschutz.html" hreflang="de">Privacy policy (German)</a></li>
+      <li><a href="../datenschutz.html#partnerprogramm" hreflang="de">Affiliate links (German)</a></li></ul></div>
+  </div>
+  <p class="klein">As an Amazon Associate we earn from qualifying purchases. Links marked with * are affiliate links: if you buy through them, we receive a small commission. The price stays the same for you.</p>
+  <p class="klein" lang="de">Als Amazon-Partner verdienen wir an qualifizierten Verkäufen.</p>
+  <p class="klein">The German versions of our legal texts are binding. © 2026 BuntwerkStudio · Owner Robert Maximilian Maahs · Small business under § 19 UStG (no VAT charged)</p>
+</div></footer>'''
+
 
 def seite(datei, titel, beschreibung, inhalt, ld=None, index=True, og_typ='website'):
-    url = BASIS + ('' if datei == 'index.html' else datei)
+    en = englisch(datei)
+    pre = '../' if en else ''
+    url = adresse(datei)
     robots = 'index, follow, max-image-preview:large' if index else 'noindex, follow'
     lds = ''.join(f'<script type="application/ld+json">{json.dumps(x, ensure_ascii=False, separators=(",", ":"))}</script>' for x in (ld or []))
+    paar = DE.get(datei) if en else EN.get(datei)
+    alternativ = '' if not paar else ''.join(
+        f'<link rel="alternate" hreflang="{h}" href="{adresse(d)}">{chr(10)}  '
+        for h, d in (('de', paar if en else datei), ('en', datei if en else paar), ('x-default', paar if en else datei)))
     html = f'''<!doctype html>
-<html lang="de">
+<html lang="{'en' if en else 'de'}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -157,8 +224,8 @@ def seite(datei, titel, beschreibung, inhalt, ld=None, index=True, og_typ='websi
   <meta name="description" content="{beschreibung}">
   <meta name="robots" content="{robots}">
   <link rel="canonical" href="{url}">
-  <meta property="og:type" content="{og_typ}">
-  <meta property="og:locale" content="de_DE">
+  {alternativ}<meta property="og:type" content="{og_typ}">
+  <meta property="og:locale" content="{'en_GB' if en else 'de_DE'}">
   <meta property="og:site_name" content="BuntwerkStudio">
   <meta property="og:title" content="{titel}">
   <meta property="og:description" content="{beschreibung}">
@@ -169,19 +236,21 @@ def seite(datei, titel, beschreibung, inhalt, ld=None, index=True, og_typ='websi
   <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#273134">
   <link rel="icon" href="{FAVICON}">
-  <link rel="preload" href="fonts/fredoka-600.woff" as="font" type="font/woff" crossorigin>
-  <script src="js/thema.js"></script>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="preload" href="{pre}fonts/fredoka-600.woff" as="font" type="font/woff" crossorigin>
+  <script src="{pre}js/thema.js"></script>
+  <link rel="stylesheet" href="{pre}css/style.css">
   {lds}
 </head>
 <body>
 {kopf(datei)}
 {inhalt}
-{FUSS}
-<script src="js/partner.js" defer></script>
+{FUSS_EN if en else FUSS}
+<script src="{pre}js/partner.js" defer></script>
+<script src="{pre}js/sprache.js" defer></script>
 </body>
 </html>
 '''
+    os.makedirs(os.path.dirname(os.path.join(ZIEL, datei)), exist_ok=True)
     with open(os.path.join(ZIEL, datei), 'w', encoding='utf-8') as f:
         f.write(html)
 
@@ -489,27 +558,27 @@ seite('wanderroute-3d-relief.html', 'Wanderroute als 3D-Relief – GPX in 3D dru
 
 # Stand KDP-Bücherregal 18.10.2026, alle als Taschenbuch live
 BUCHLISTE = [
-    dict(asin='B0G2HKSN16', datei='adventsmalbuch', titel='Adventsmalbuch',
+    dict(asin='B0G2HKSN16', en_unter='An advent calendar to colour in for children, with 24 pictures and numbers', en_text='24 pictures to colour in, one for each day until Christmas. With big numbers so children can find the days themselves.', datei='adventsmalbuch', titel='Adventsmalbuch',
          unter='Ein Adventskalender zum Ausmalen für Kinder mit 24 Bildern und Zahlen',
          text='24 Bilder zum Ausmalen, eins für jeden Tag bis Weihnachten. Mit großen Zahlen, damit Kinder die Tage selbst finden.',
          gruppe='Kinder', farbe='#b8312f', motiv='stern', jahr='2025-11-15'),
-    dict(asin='B0DC131TPW', datei='tiermalbuch', titel='Mein buntes Tiermalbuch',
+    dict(asin='B0DC131TPW', en_unter='30 animals in 10 languages', en_text='30 animals to colour in. Each animal has its name in 10 languages. Colour and learn words along the way.', datei='tiermalbuch', titel='Mein buntes Tiermalbuch',
          unter='30 Tiere in 10 Sprachen',
          text='30 Tiere zum Ausmalen. Zu jedem Tier steht der Name in 10 Sprachen. Malen und nebenbei Wörter lernen.',
          gruppe='Kinder', farbe='#3a6ea5', motiv='tier', jahr='2024-08-02'),
-    dict(asin='B0FDQDGMPS', datei='dino-skizzenbuch', titel='Dino-Skizzenbuch',
+    dict(asin='B0FDQDGMPS', en_unter='100 pages to draw on, for children aged 4 and up', en_text='Blank sketchbook with a funny dinosaur on the cover. 100 empty pages for their own pictures.', datei='dino-skizzenbuch', titel='Dino-Skizzenbuch',
          unter='100 Seiten zum Zeichnen für Kinder ab 4 Jahren',
          text='Blanko-Skizzenbuch mit lustigem Dinosaurier auf dem Umschlag. 100 leere Seiten für eigene Bilder.',
          gruppe='Kinder', farbe='#4f6e45', motiv='dino', jahr='2025-06-19'),
-    dict(asin='B0FF39FCHH', datei='feen-skizzenbuch', titel='Feen-Skizzenbuch',
+    dict(asin='B0FF39FCHH', en_unter='Blank drawing book for children aged 4 and up', en_text='Empty pages to draw on, with a little fairy at the edge of the page.', datei='feen-skizzenbuch', titel='Feen-Skizzenbuch',
          unter='Blanko-Zeichenbuch für Kinder ab 4 Jahren',
          text='Leere Seiten zum Zeichnen, begleitet von einer kleinen Fee am Seitenrand.',
          gruppe='Kinder', farbe='#8a5aa8', motiv='fee', jahr='2025-06-22'),
-    dict(asin='B0FRXY1SQY', datei='heilung-selbstliebe', titel='Heilung & Selbstliebe',
+    dict(asin='B0FRXY1SQY', en_unter='Mandalas and affirmations to colour in', en_text='Mandalas to colour in, each with an affirmation. For quiet moments and to switch off.', datei='heilung-selbstliebe', titel='Heilung & Selbstliebe',
          unter='Mandalas für ein höheres Selbst – Mandalas und Affirmationen zum Ausmalen',
          text='Mandalas zum Ausmalen, jeweils mit einer Affirmation. Für ruhige Minuten und zum Abschalten.',
          gruppe='Erwachsene', farbe='#2f7d7a', motiv='mandala', jahr='2025-09-20'),
-    dict(asin='B0G1KV25LM', datei='reichtum-wohlstand', titel='Reichtum, Wohlstand und Manifestation',
+    dict(asin='B0G1KV25LM', en_unter='Mandalas and affirmations to colour in', en_text='Mandalas with affirmations about abundance and wealth. Colouring as a small daily break.', datei='reichtum-wohlstand', titel='Reichtum, Wohlstand und Manifestation',
          unter='Mandalas und Affirmationen zum Ausmalen',
          text='Mandalas mit Affirmationen rund um Fülle und Wohlstand. Ausmalen als kleine tägliche Auszeit.',
          gruppe='Erwachsene', farbe='#c9a23f', motiv='mandala', jahr='2025-11-09'),
@@ -577,7 +646,14 @@ for b in BUCHLISTE:
         b['bild'], b['bw'], b['bh'] = f"img/buch-{b['datei']}.svg", 400, 600
 
 
-def buchkarte(b):
+def buchkarte(b, en=False):
+    if en:
+        return (f'<article class="buch">'
+                f'<img src="../{b["bild"]}" alt="Cover of “{b["titel"]}”" width="{b["bw"]}" height="{b["bh"]}" loading="lazy">'
+                f'<p class="kennung">{"Children" if b["gruppe"] == "Kinder" else "Adults"} · Paperback in German</p>'
+                f'<h3 lang="de">{b["titel"]}</h3><p>{b["en_unter"]}</p><p>{b["en_text"]}</p>'
+                f'<div class="knoepfe"><a class="haupt" href="https://www.amazon.de/dp/{b["asin"]}" data-amazon rel="sponsored noopener" target="_blank">View on Amazon.de*</a></div>'
+                f'</article>')
     return (f'<article class="buch">'
             f'<img src="{b["bild"]}" alt="Umschlag von „{b["titel"]}“" width="{b["bw"]}" height="{b["bh"]}" loading="lazy">'
             f'<p class="kennung">{b["gruppe"]} · Taschenbuch</p>'
@@ -753,20 +829,384 @@ seite('datenschutz.html', 'Datenschutz – BuntwerkStudio', 'Datenschutzerkläru
 seite('404.html', 'Seite nicht gefunden – BuntwerkStudio', 'Diese Seite gibt es nicht.',
       f'''<main class="huelle held"><div><p class="marke">Fehler 404</p><h1>Diese Seite gibt es nicht</h1>
       <p class="einleitung">Vielleicht hilft dir einer dieser Wege weiter.</p>
-      <div class="knoepfe"><a class="haupt" href="./">Zur Startseite</a><a class="zweit" href="{KLANGFORM}" rel="noopener">Klangform</a><a class="zweit" href="{WEGFORM}" rel="noopener">Wegform</a></div></div>
+      <div class="knoepfe"><a class="haupt" href="/">Zur Startseite</a><a class="zweit" href="{KLANGFORM}" rel="noopener">Klangform</a><a class="zweit" href="{WEGFORM}" rel="noopener">Wegform</a></div>
+      <div lang="en"><h2>Page not found</h2><p>This page does not exist. <a href="/en/">Go to the English home page</a>.</p></div></div>
       <div class="bett">{WEG_BILD}</div></main>''', index=False)
+
+# ---------------------------------------------------------------- Englische Seiten (B7)
+# Kurz und klar, Leser mit „you“. Die Konfiguratoren Klangform und Wegform gibt es nur auf Deutsch (Entscheidung 24.10.2026).
+# tools/sprache-pruefen.py prüft, dass die englischen Seiten außerhalb von lang="de" keine Umlaute enthalten.
+
+NUR_DEUTSCH = '<p class="leise">The configurators are in German.</p>'
+VERSAND_EN = 'We ship printed models within Germany only. Print files are available worldwide.'
+AUSVERKAUFT_EN = '' if DRUCK_VERFUEGBAR else '<div class="kasten"><p><strong>Currently sold out:</strong> we cannot deliver printed parts at the moment. You can still get the print file (STL) for €2 by email.</p></div>'
+MUENSTERLAND = '<span lang="de">Münsterland</span>'
+AUTOREN_EN = '<span lang="de">Robert Maximilian Maahs</span> and <span lang="de">Christopher Müller</span>'
+
+HELD_EN = svg(relief(205, 190, 128) + anhaenger(268, 268, 190, 62, '#c9a23f', -8) + buch(372, 60, 92, 136, '#3a6ea5', 7),
+              titel='3D-printed hiking relief, sound wave keychain and book on a print bed')
+KLANG_EN = svg(anhaenger(95, 80, 280, 90, '#c9a23f', -6) + anhaenger(45, 235, 210, 66, '#3a6ea5', 4) + anhaenger(285, 250, 160, 52, '#ecebe6', -10),
+               titel='Keychains in the shape of a sound wave')
+WEG_EN = svg(relief(250, 205, 165), titel='Relief of a hiking route with colour bands by height and a red route')
+COLLAGE_EN = collage([('dino-skizzenbuch', -7), ('feen-skizzenbuch', 3), ('reichtum-wohlstand', 9)]).replace('src="img/', 'src="../img/')
+
+ORG_EN = {**ORG, "description": "3D-printed personalised keepsakes and books from Ostbevern, Germany."}
+
+START_EN = f'''<main>
+<section class="huelle held">
+  <div>
+    <p class="marke">3D printing from Germany</p>
+    <h1>Memories you can hold in your hand</h1>
+    <p class="einleitung">We print your voice as a sound wave and your hike as a relief with real terrain. You design it in your browser, we print it in Ostbevern and Ascheberg in the {MUENSTERLAND} region.</p>
+    <div class="knoepfe">
+      <a class="haupt" href="sound-wave-keychain.html">Sound wave keychain <span class="pfeil" aria-hidden="true">→</span></a>
+      <a class="zweit" href="hiking-route-3d-relief.html">Hiking route as a relief</a>
+    </div>
+    <p class="leise">{VERSAND_EN}</p>
+    <div class="streifen" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  </div>
+  <div class="bett">{HELD_EN}</div>
+</section>
+
+<section class="abschnitt"><div class="huelle">
+  <div class="kopf-abschnitt"><p class="marke">Our two workshops</p>
+    <h2>Two configurators, one studio</h2>
+    <p>Both run entirely in your browser. Your recording and your route stay on your device. You see a preview and the price right away. The configurators are in German.</p></div>
+  <div class="karten">
+    <article class="karte karte-oben gold">
+      <div class="bett">{KLANG_EN}</div>
+      <div class="karte-text">
+        <p class="marke">Klangform</p>
+        <h3>Your voice as a keychain, pendant or desk display</h3>
+        <p>Record an “I love you”, a laugh or a heartbeat. We turn it into a solid piece in the shape of your sound wave. From <span class="preis">€6</span>.{'' if DRUCK_VERFUEGBAR else ' Printed parts are sold out right now; the print file costs €2.'}</p>
+        <div class="knoepfe">
+          <a class="haupt" href="{KLANGFORM}" rel="noopener" hreflang="de">Design with Klangform <span class="pfeil" aria-hidden="true">→</span></a>
+          <a class="zweit" href="sound-wave-keychain.html">Learn more</a>
+        </div>
+        {NUR_DEUTSCH}
+      </div>
+    </article>
+    <article class="karte karte-oben gruen">
+      <div class="bett">{WEG_EN}</div>
+      <div class="karte-text">
+        <p class="marke">Wegform</p>
+        <h3>Your hike as a 3D relief with real terrain</h3>
+        <p>Upload your GPX or FIT file from Garmin, Strava or Komoot. We print the mountains, valleys and your route, with colour bands by height if you like.</p>
+        <div class="knoepfe">
+          <a class="haupt" href="{WEGFORM}" rel="noopener" hreflang="de">Design with Wegform <span class="pfeil" aria-hidden="true">→</span></a>
+          <a class="zweit" href="hiking-route-3d-relief.html">Learn more</a>
+        </div>
+        {NUR_DEUTSCH}
+      </div>
+    </article>
+  </div>
+</div></section>
+
+<section class="abschnitt"><div class="huelle">
+  <div class="kopf-abschnitt"><p class="marke">How it works</p><h2>Three steps to your piece</h2></div>
+  <ol class="ablauf">
+    <li><h3>Design</h3><p>Record a sound or upload a route, then choose the product, shape, size and colour.</p></li>
+    <li><h3>Order</h3><p>You pay with PayPal. Print files are ready to download right after payment.</p></li>
+    <li><h3>Unpack</h3><p>We print your piece and ship it within Germany. For Klangform within 7 days of payment.</p></li>
+  </ol>
+</div></section>
+
+<section class="abschnitt"><div class="huelle">
+  <div class="kopf-abschnitt"><p class="marke">Gift ideas</p><h2>Who is it for?</h2>
+    <p>Personal gifts that exist only once.</p></div>
+  <ul class="chips">
+    <li>Anniversary and Valentine’s Day</li><li>Wedding: the “I do”</li><li>Birth: the first heartbeat</li>
+    <li>Grandparents: the grandchildren’s voices</li><li>Hikers and climbers</li><li>Runners: the marathon course</li>
+    <li>Cyclists: an alpine pass</li><li>Christmas</li><li>In memory of a loved one</li>
+  </ul>
+</div></section>
+
+<section class="abschnitt"><div class="huelle karten">
+  <div>
+    <p class="marke">Books</p><h2>Colouring books for young and old</h2>
+    <p class="leise">{AUTOREN_EN} have made colouring books and sketchbooks for children aged 4 and up and mandala colouring books with affirmations. All are paperbacks in German, sold on Amazon.de.</p>
+    <div class="knoepfe"><a class="zweit" href="books.html">See the books <span class="pfeil" aria-hidden="true">→</span></a></div>
+  </div>
+  {COLLAGE_EN}
+</div></section>
+</main>'''
+
+seite('en/index.html', 'BuntwerkStudio – sound waves and hiking routes as 3D prints',
+      'Personalised 3D-printed gifts from Germany: your voice as a sound wave keychain (Klangform) and your hiking route as a 3D relief (Wegform). Plus colouring books for children and adults.',
+      START_EN, ld=[ORG_EN, {"@context": "https://schema.org", "@type": "WebSite", "name": "BuntwerkStudio", "url": BASIS + 'en/', "inLanguage": "en",
+                             "publisher": {"@id": BASIS + "#organisation"}}])
+
+K_FRAGEN_EN = [
+    ('What can I record?', 'Anything with a sound: a name, an “I love you”, a laugh, a heartbeat from an ultrasound video, a voice message or a few seconds of your song. 2 to 5 seconds work best.'),
+    ('Can I use a voice message or a video?', 'Yes. Instead of recording, you can upload an audio or video file, for example a saved voice message or an ultrasound video. Then you choose the part you want.'),
+    ('Is my recording uploaded?', 'No. The recording is only analysed in your browser. It becomes a row of numbers for the shape. The sound cannot be restored from these numbers.'),
+    ('How much does a sound wave keychain cost?', 'A keychain costs €7 to €9 depending on the size, a pendant €7, a Christmas ornament from €6. Shipping within Germany costs €2.95. All prices are final prices.'),
+    ('Do you ship outside Germany?', VERSAND_EN),
+    ('How long does delivery take?', 'We print your piece and ship it within 7 days of payment.' + ('' if DRUCK_VERFUEGBAR else ' Printed parts are sold out right now. The print file comes by email after payment.')),
+    ('Is a chain or ribbon included?', 'No. Pendants come without a chain, bookmarks and Christmas ornaments without a ribbon. You find matching chains, ribbons and key rings on our recommendations page.'),
+    ('Can I print it myself?', 'Yes. Instead of the printed part you can order the STL file for €2 and print it on your own 3D printer.'),
+]
+PRODUKTE_K_EN = [
+    ('Keychain', 'Small, medium, large', '€7 to €9', 'With a 5 mm hole for the key ring. 9 shapes from bars to heart.'),
+    ('Pendant', 'one size', '€7', 'Small and light, with a 3 mm hole. Without chain.'),
+    ('Bookmark', '15 cm', '€7', 'Plate with sound wave, with a name if you like.'),
+    ('Christmas ornament', 'Small, medium', '€6 to €8', 'Star, disc or heart to hang up.'),
+    ('Coaster', '9.5 cm', '€8', 'For cups and glasses.'),
+    ('Desk display', '10, 14, 18 cm wide', '€9.90 to €15.90', 'Skyline with a stand, with a name in the base if you like.'),
+    ('Earrings', 'one pair', 'soon', 'Very light, without hooks. Not available yet.'),
+    ('STL file', '–', '€2', 'To print yourself, sent by email.'),
+]
+
+KLANG_EN_SEITE = f'''<main>
+<section class="huelle held">
+  <div>
+    <p class="marke">Klangform</p>
+    <h1>Sound wave as a keychain, pendant and desk display</h1>
+    <p class="einleitung">Record your voice, a laugh or a heartbeat. We print a piece in the shape of your sound wave. From €6, printed in Germany.</p>
+    <div class="knoepfe">
+      <a class="haupt" href="{KLANGFORM}" rel="noopener" hreflang="de">Design your sound wave <span class="pfeil" aria-hidden="true">→</span></a>
+      <a class="zweit" href="#prices">See prices</a>
+    </div>
+    {NUR_DEUTSCH}
+    {AUSVERKAUFT_EN}
+  </div>
+  <div class="bett">{KLANG_EN}<p class="unterschrift">Keychain, bar shape. Every wave is unique.</p></div>
+</section>
+
+<section class="abschnitt"><div class="huelle">
+  <div class="kopf-abschnitt"><p class="marke">How it works</p><h2>From sound to keychain in two minutes</h2></div>
+  <ol class="ablauf">
+    <li><h3>Record</h3><p>Record directly in your browser or choose an audio or video file. 2 to 5 seconds are enough.</p></li>
+    <li><h3>Choose a shape</h3><p>Bars, wave, round, ring, plate, heart, star, disc, infinity or skyline. Then size and colour.</p></li>
+    <li><h3>Order</h3><p>You pay with PayPal. We print and ship your piece within Germany.</p></li>
+  </ol>
+  {NUR_DEUTSCH}
+</div></section>
+
+<section class="abschnitt"><div class="huelle">
+  <div class="kopf-abschnitt"><p class="marke">Occasions</p><h2>A gift that sounds like you</h2>
+    <p>A sound wave keychain holds on to a moment you could otherwise only hear.</p></div>
+  <ul class="chips">
+    <li>“I love you” for an anniversary</li><li>The “I do” at the wedding</li><li>A heartbeat from the ultrasound</li>
+    <li>Your child’s name</li><li>The first “Mama” or “Papa”</li><li>Grandchildren laughing, for grandparents</li>
+    <li>A voice message from a loved one</li><li>A clip from your song</li><li>Christmas ornament with a child’s voice</li>
+  </ul>
+</div></section>
+
+<section class="abschnitt" id="prices"><div class="huelle">
+  <div class="kopf-abschnitt"><p class="marke">Products and prices</p><h2>What we print from your sound wave</h2>
+    <p>All pieces are solid, made in one part and one colour, with no small parts. Final prices; as a small business we do not charge VAT. Shipping within Germany €2.95. {VERSAND_EN}</p></div>
+  <div class="tabelle-huelle"><table>
+    <thead><tr><th scope="col">Product</th><th scope="col">Size</th><th scope="col">Price</th><th scope="col">Details</th></tr></thead>
+    <tbody>{''.join(f'<tr><th scope="row">{a}</th><td>{b}</td><td class="preis">{c}</td><td>{d}</td></tr>' for a, b, c, d in PRODUKTE_K_EN)}</tbody>
+  </table></div>
+  {AUSVERKAUFT_EN}
+  <div class="knoepfe"><a class="haupt" href="{KLANGFORM}" rel="noopener" hreflang="de">Go to Klangform <span class="pfeil" aria-hidden="true">→</span></a></div>
+  {NUR_DEUTSCH}
+</div></section>
+
+<section class="abschnitt"><div class="huelle">
+  <div class="kopf-abschnitt"><p class="marke">Privacy</p><h2>Your recording stays with you</h2>
+    <p>Klangform needs no server for your recording. Your browser calculates the sound wave. Only the numbers for the shape go into the order, never the sound itself. No cookies, no tracking.</p></div>
+</div></section>
+
+<section class="abschnitt"><div class="huelle">
+  <div class="kopf-abschnitt"><p class="marke">Questions</p><h2>Frequently asked questions about the sound wave keychain</h2></div>
+  {fragen_html(K_FRAGEN_EN)}
+</div></section>
+</main>'''
+
+seite('en/sound-wave-keychain.html', 'Sound wave keychain – personalised and 3D-printed | Klangform',
+      'Your voice as a sound wave keychain, pendant, bookmark or desk display. Recorded in your browser, 3D-printed in Germany, from €6.',
+      KLANG_EN_SEITE, ld=[kruemel(('en/index.html', 'Home'), ('en/sound-wave-keychain.html', 'Klangform')),
+                          {"@context": "https://schema.org", "@type": "Product", "name": "Klangform sound wave keychain",
+                           "description": "Personalised 3D-printed keychain, pendant, bookmark, Christmas ornament, coaster or desk display in the shape of your own sound wave.",
+                           "image": BASIS + "img/vorschau.png", "brand": {"@type": "Brand", "name": "Klangform"}, "category": "Personalised gifts",
+                           "material": "PLA", "manufacturer": {"@id": BASIS + "#organisation"},
+                           "offers": {"@type": "AggregateOffer", "priceCurrency": "EUR", "lowPrice": "6.00", "highPrice": "15.90", "offerCount": "7",
+                                      "availability": "https://schema.org/InStock" if DRUCK_VERFUEGBAR else "https://schema.org/OutOfStock", "url": KLANGFORM,
+                                      "seller": {"@id": BASIS + "#organisation"}}},
+                          fragen_ld(K_FRAGEN_EN)])
+
+W_FRAGEN_EN = [
+    ('Which files can I upload?', 'GPX and FIT files. You get them from Garmin Connect, Strava, Komoot, Wahoo, Suunto, Polar and most other apps for watches and bike computers.'),
+    ('Where does the terrain come from?', 'From worldwide elevation data (AWS Terrain Tiles). Your relief shows the mountains and valleys around your route, not just the line.'),
+    ('What is the difference between Basic, Premium and Real?', 'Basic: terrain in one colour, the route as a separate red part to plug in. Premium: terrain in 2 to 4 colour bands by height, from green to white. Real: terrain in real colours, with water, forest, meadow and rock.'),
+    ('How big is the relief?', 'Round, square or hexagonal, 60, 100 or 150 mm. There is a base plate with title, date, time, kilometres, metres of climbing and, if you like, the elevation profile.'),
+    ('Does my route leave my device?', 'Your file stays in your browser. Only a simplified route goes into the order code, so that we can print the model.'),
+    ('Do you ship outside Germany?', VERSAND_EN),
+    ('Is there a pendant too?', 'Yes. The pendant (50 mm) shows your route, has a hole at the top and the name and time on the back.'),
+]
+EXPORT_EN = [
+    ('Garmin Connect', 'Open the activity, click the gear icon at the top right, then “Export to GPX” or “Export Original” (FIT).'),
+    ('Strava', 'Open the activity on a computer, click the three dots on the left, then “Export GPX”.'),
+    ('Komoot', 'Open the tour on a computer, click the three dots, then “Download” or “Download GPX file”.'),
+    ('Other watches and apps', 'Look in the activity menu for “Export”, “GPX” or “Download file”.'),
+]
+
+WEG_EN_SEITE = f'''<main>
+<section class="huelle held">
+  <div>
+    <p class="marke">Wegform</p>
+    <h1>Your hiking route as a 3D relief</h1>
+    <p class="einleitung">Upload your GPX or FIT file. We print the real terrain around your tour, with your route in red. For the summit hike, the marathon or the alpine pass.</p>
+    <div class="knoepfe">
+      <a class="haupt" href="{WEGFORM}" rel="noopener" hreflang="de">Design your relief <span class="pfeil" aria-hidden="true">→</span></a>
+      <a class="zweit" href="#gpx">Find your GPX file</a>
+    </div>
+    {NUR_DEUTSCH}
+  </div>
+  <div class="bett">{WEG_EN}<p class="unterschrift">Premium relief, hexagonal, with colour bands by height and the route.</p></div>
+</section>
+
+<section class="abschnitt"><div class="huelle">
+  <div class="kopf-abschnitt"><p class="marke">How it works</p><h2>From your tour to a model</h2></div>
+  <ol class="ablauf">
+    <li><h3>Upload your route</h3><p>GPX or FIT from your watch, bike computer or app. The file stays in your browser.</p></li>
+    <li><h3>Design</h3><p>Choose the product, shape, size, colours and section. The 3D preview shows you the result right away.</p></li>
+    <li><h3>Order</h3><p>You pay with PayPal. Print files are ready to download straight away. Printed reliefs are printed with 0.2 mm layers and shipped within Germany.</p></li>
+  </ol>
+  {NUR_DEUTSCH}
+</div></section>
+
+<section class="abschnitt"><div class="huelle">
+  <div class="kopf-abschnitt"><p class="marke">Products</p><h2>Relief, base plate and pendant</h2></div>
+  <div class="karten drei">
+    <article class="karte karte-oben gruen"><div class="karte-text"><h3>Relief</h3>
+      <p>Real terrain in 60, 100 or 150 mm, round, square or hexagonal.</p>
+      <ul class="liste"><li>Basic: terrain in one colour, route to plug in</li><li>Premium: 2 to 4 colour bands by height</li><li>Real: water, forest, meadow and rock in real colours</li></ul></div></article>
+    <article class="karte karte-oben gold"><div class="karte-text"><h3>Base plate</h3>
+      <p>The frame for your relief, with raised lettering on the edge.</p>
+      <ul class="liste"><li>Title, date and time</li><li>Kilometres and metres of climbing</li><li>Elevation profile if you like</li></ul></div></article>
+    <article class="karte karte-oben rot"><div class="karte-text"><h3>Pendant</h3>
+      <p>Your route to take with you, 50 mm, with a hole.</p>
+      <ul class="liste"><li>Round, square or hexagonal</li><li>Name and time on the back</li><li>For keys, backpack or medal hanger</li></ul></div></article>
+  </div>
+  <p class="leise">You see the prices in the configurator before you order. {VERSAND_EN}</p>
+</div></section>
+
+<section class="abschnitt"><div class="huelle">
+  <div class="kopf-abschnitt"><p class="marke">Ideas</p><h2>Which tour will it be?</h2></div>
+  <ul class="chips">
+    <li>A summit in the Alps</li><li>Crossing the Alps on the E5</li><li>A stage of the Camino de Santiago</li><li>Your first marathon</li>
+    <li>Ultra trail</li><li>Road bike over a pass</li><li>Wedding hike</li><li>Your local loop</li>
+    <li>A gift for the hiking club</li>
+  </ul>
+</div></section>
+
+<section class="abschnitt" id="gpx"><div class="huelle">
+  <div class="kopf-abschnitt"><p class="marke">How to</p><h2>How to get your GPX file</h2>
+    <p>Almost every sports app can save your activity as a file. This is how it works in the best-known ones:</p></div>
+  <div class="tabelle-huelle"><table>
+    <thead><tr><th scope="col">App</th><th scope="col">How it works</th></tr></thead>
+    <tbody>{''.join(f'<tr><th scope="row">{a}</th><td>{b}</td></tr>' for a, b in EXPORT_EN)}</tbody>
+  </table></div>
+</div></section>
+
+<section class="abschnitt"><div class="huelle">
+  <div class="kopf-abschnitt"><p class="marke">Questions</p><h2>Frequently asked questions about the 3D relief</h2></div>
+  {fragen_html(W_FRAGEN_EN)}
+</div></section>
+</main>'''
+
+seite('en/hiking-route-3d-relief.html', 'Hiking route as a 3D relief – print your GPX in 3D | Wegform',
+      'Your hike, bike ride or marathon as a 3D-printed relief with real terrain. Upload GPX or FIT, design, order. With base plate and elevation profile.',
+      WEG_EN_SEITE, ld=[kruemel(('en/index.html', 'Home'), ('en/hiking-route-3d-relief.html', 'Wegform')), fragen_ld(W_FRAGEN_EN)])
+
+BUECHER_EN = f'''<main>
+<section class="huelle held">
+  <div>
+    <p class="marke">Books</p>
+    <h1>Colouring books and sketchbooks</h1>
+    <p class="einleitung">By {AUTOREN_EN}: colouring books and sketchbooks for children aged 4 and up and mandala colouring books with affirmations for adults. All are paperbacks in German, sold on Amazon.de.</p>
+    <div class="knoepfe"><a class="haupt" href="#children">For children</a><a class="zweit" href="#adults">For adults</a></div>
+  </div>
+  {COLLAGE.replace('src="img/', 'src="../img/')}
+</section>
+
+<section class="abschnitt" id="children"><div class="huelle">
+  <div class="kopf-abschnitt"><p class="marke">For children</p><h2>Colour, draw, learn words</h2>
+    <p>Gift ideas for children aged 4 and up: for Advent, for kindergarten or for long car journeys.</p></div>
+  <div class="buecher">{''.join(buchkarte(b, True) for b in kinder)}</div>
+</div></section>
+
+<section class="abschnitt" id="adults"><div class="huelle">
+  <div class="kopf-abschnitt"><p class="marke">For adults</p><h2>Mandalas with affirmations</h2>
+    <p>Colouring to relax. Each mandala has a sentence to take with you through the day.</p></div>
+  <div class="buecher">{''.join(buchkarte(b, True) for b in gross)}</div>
+  <p class="partner-hinweis">* Affiliate link: as an Amazon Associate we earn from qualifying purchases. The price stays the same for you. You see the current price on Amazon.de.</p>
+</div></section>
+</main>'''
+
+seite('en/books.html', 'Colouring books for children and mandala colouring books | BuntwerkStudio',
+      'Colouring books and sketchbooks for children aged 4 and up and mandala colouring books with affirmations, in German. Paperbacks on Amazon.de.',
+      BUECHER_EN, ld=[kruemel(('en/index.html', 'Home'), ('en/books.html', 'Books')),
+                      {"@context": "https://schema.org", "@type": "ItemList", "name": "Books by BuntwerkStudio",
+                       "itemListElement": [{"@type": "ListItem", "position": i + 1, "item": buch_ld(b)} for i, b in enumerate(BUCHLISTE)]}])
+
+# Suchbegriffe bleiben deutsch (amazon.de, Partner-ID gilt nur dort)
+GRUPPEN_EN = [
+    ('For your Klangform piece', 'gold', 'We deliver pendants, bookmarks and Christmas ornaments without chain or ribbon. These go well with them:', [
+        ('Necklace for pendants', 'Thin chain with a small clasp. Our hole is 3.2 mm.', 'Halskette Edelstahl dünn Damen'),
+        ('Key rings', 'For the 5 mm hole on the keychain.', 'Schlüsselringe 25mm Edelstahl'),
+        ('Satin ribbon', 'For bookmarks and Christmas ornaments.', 'Satinband 3mm'),
+        ('Earring hooks', 'For the earrings, made of skin-friendly material.', 'Ohrhaken Titan hypoallergen'),
+    ]),
+    ('For your Wegform relief', 'gruen', 'So that your relief tells even more:', [
+        ('Wall shelf or picture ledge', 'To display the relief and base plate.', 'Bilderleiste Holz 60cm'),
+        ('Medal hanger', 'For runners: medal and Wegform pendant in one place.', 'Medaillenhalter Laufen'),
+    ]),
+    ('For self-printers', 'blau', 'You bought the STL file and print it yourself? This is what we print with:', [
+        ('PLA filament 1.75 mm', 'PLA is enough for all Klangform parts, 100 % infill, 0.2 mm layer height.', 'PLA Filament 1,75mm 1kg'),
+        ('0.4 mm nozzle', 'Our parts are designed for a 0.4 mm nozzle.', 'Düse 0,4mm 3D Drucker'),
+        ('Bed adhesive', 'So that flat parts stay flat on the print bed.', 'Druckbett Haftspray 3D Druck'),
+    ]),
+]
+
+
+def gruppen_html_en():
+    out = []
+    for titel, farbe, text, eintraege in GRUPPEN_EN:
+        karten = ''.join(f'<article class="karte karte-oben {farbe}"><div class="karte-text"><h3>{n}</h3><p>{b}</p>'
+                         f'<div class="knoepfe">{partnerlink(amazon_suche(s), "View on Amazon.de")}</div></div></article>'
+                         for n, b, s in eintraege)
+        out.append(f'<section class="abschnitt"><div class="huelle"><div class="kopf-abschnitt"><h2>{titel}</h2><p>{text}</p></div>'
+                   f'<div class="karten drei">{karten}</div></div></section>')
+    return ''.join(out)
+
+
+EMPF_EN = f'''<main>
+<section class="huelle held">
+  <div>
+    <p class="marke">Recommendations</p>
+    <h1>What goes with our pieces</h1>
+    <p class="einleitung">Accessories we use ourselves or that go with our prints. The links lead to a search on Amazon.de, so you can compare for yourself.</p>
+    <p class="partner-hinweis">All links marked with * are affiliate links. As an Amazon Associate we earn from qualifying purchases. If you buy through them, we receive a small commission. The price stays the same for you. More in our <a href="../datenschutz.html#partnerprogramm" hreflang="de">privacy policy (German)</a>.</p>
+  </div>
+  <div class="bett">{KLANG_EN}</div>
+</section>
+{gruppen_html_en()}
+</main>'''
+
+seite('en/recommendations.html', 'Accessories for sound wave keychains and 3D reliefs | BuntwerkStudio',
+      'Chains, key rings, ribbons, picture ledges and filament: accessories that go with the 3D prints from Klangform and Wegform.',
+      EMPF_EN, ld=[kruemel(('en/index.html', 'Home'), ('en/recommendations.html', 'Recommendations'))])
 
 # ---------------------------------------------------------------- robots, sitemap
 
 with open(os.path.join(ZIEL, 'robots.txt'), 'w') as f:
     f.write(f'User-agent: *\nAllow: /\n\nSitemap: {BASIS}sitemap.xml\n')
 
-sm = [('', '1.0'), ('schallwelle-anhaenger.html', '0.9'), ('wanderroute-3d-relief.html', '0.9'),
+sm = [('index.html', '1.0'), ('schallwelle-anhaenger.html', '0.9'), ('wanderroute-3d-relief.html', '0.9'),
       ('buecher.html', '0.7'), ('empfehlungen.html', '0.5'), ('impressum.html', '0.2'), ('datenschutz.html', '0.2')]
+sm += [(EN[d], prio) for d, prio in sm if d in EN]
 with open(os.path.join(ZIEL, 'sitemap.xml'), 'w') as f:
-    f.write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n')
+    f.write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n')
     for p, prio in sm:
-        f.write(f'  <url><loc>{BASIS}{p}</loc><lastmod>2026-10-18</lastmod><priority>{prio}</priority></url>\n')
+        paar = EN.get(p) or DE.get(p)
+        alt = '' if not paar else ''.join(f'<xhtml:link rel="alternate" hreflang="{h}" href="{adresse(d)}"/>'
+                                          for h, d in (('de', DE.get(p, p)), ('en', EN.get(p, p)), ('x-default', DE.get(p, p))))
+        f.write(f'  <url><loc>{adresse(p)}</loc><lastmod>{GEAENDERT}</lastmod><priority>{prio}</priority>{alt}</url>\n')
     f.write('</urlset>\n')
 
 # Bild für die Vorschau (SVG) – wird in PNG umgewandelt
