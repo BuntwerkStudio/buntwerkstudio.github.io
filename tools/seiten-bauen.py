@@ -274,6 +274,11 @@ def amazon_suche(begriff):
     return f'https://www.amazon.de/s?k={quote_plus(begriff)}'
 
 
+def amazon_ziel(ziel):
+    """Empfehlung: Suchbegriff (str) oder ein bestimmter Artikel ({'asin': …}). Die Partner-Kennung hängt js/partner.js an."""
+    return f'https://www.amazon.de/dp/{ziel["asin"]}' if isinstance(ziel, dict) else amazon_suche(ziel)
+
+
 def partnerlink(href, text, klasse='zweit'):
     return f'<a class="{klasse}" href="{href}" data-amazon rel="sponsored noopener" target="_blank">{text}*</a>'
 
@@ -721,6 +726,8 @@ GRUPPEN = [
         ('PLA-Filament 1,75 mm', 'Für alle Klangform-Teile reicht PLA, 100 % Füllung, 0,2 mm Schichthöhe.', 'PLA Filament 1,75mm 1kg'),
         ('Düse 0,4 mm', 'Unsere Teile sind für eine 0,4-mm-Düse ausgelegt.', 'Düse 0,4mm 3D Drucker'),
         ('Haftmittel fürs Druckbett', 'Damit flache Teile sauber liegen bleiben.', 'Druckbett Haftspray 3D Druck'),
+        # B8 (24.10.2026, Link von Robert): YOOPAI Pro Filament-Aufbewahrungsbox, 4er-Pack
+        ('Aufbewahrungsbox für Filament', 'Hält dein Filament trocken und staubfrei, damit es sauber druckt.', {'asin': 'B0G7149YPM'}),
     ]),
 ]
 
@@ -729,7 +736,7 @@ def gruppen_html():
     out = []
     for titel, farbe, text, eintraege in GRUPPEN:
         karten = ''.join(f'<article class="karte karte-oben {farbe}"><div class="karte-text"><h3>{n}</h3><p>{b}</p>'
-                         f'<div class="knoepfe">{partnerlink(amazon_suche(s), "Bei Amazon ansehen")}</div></div></article>'
+                         f'<div class="knoepfe">{partnerlink(amazon_ziel(s), "Bei Amazon ansehen")}</div></div></article>'
                          for n, b, s in eintraege)
         out.append(f'<section class="abschnitt"><div class="huelle"><div class="kopf-abschnitt"><h2>{titel}</h2><p>{text}</p></div>'
                    f'<div class="karten drei">{karten}</div></div></section>')
@@ -741,7 +748,7 @@ EMPF = f'''<main>
   <div>
     <p class="marke">Empfehlungen</p>
     <h1>Was zu unseren Stücken passt</h1>
-    <p class="einleitung">Zubehör, das wir selbst nutzen oder das zu unseren Drucken passt. Die Links führen zu einer Suche bei Amazon, damit du selbst vergleichen kannst.</p>
+    <p class="einleitung">Zubehör, das wir selbst nutzen oder das zu unseren Drucken passt. Die meisten Links führen zu einer Suche bei Amazon, damit du selbst vergleichen kannst.</p>
     <p class="partner-hinweis">Alle mit * markierten Links sind Partnerlinks. Als Amazon-Partner verdienen wir an qualifizierten Verkäufen. Kaufst du darüber ein, erhalten wir eine kleine Provision. Für dich ändert sich der Preis nicht. Mehr dazu in der <a href="datenschutz.html#partnerprogramm">Datenschutzerklärung</a>.</p>
   </div>
   <div class="bett">{KLANG_BILD}</div>
@@ -1160,6 +1167,7 @@ GRUPPEN_EN = [
         ('PLA filament 1.75 mm', 'PLA is enough for all Klangform parts, 100 % infill, 0.2 mm layer height.', 'PLA Filament 1,75mm 1kg'),
         ('0.4 mm nozzle', 'Our parts are designed for a 0.4 mm nozzle.', 'Düse 0,4mm 3D Drucker'),
         ('Bed adhesive', 'So that flat parts stay flat on the print bed.', 'Druckbett Haftspray 3D Druck'),
+        ('Filament storage box', 'Keeps your filament dry and dust-free for clean prints.', {'asin': 'B0G7149YPM'}),
     ]),
 ]
 
@@ -1168,7 +1176,7 @@ def gruppen_html_en():
     out = []
     for titel, farbe, text, eintraege in GRUPPEN_EN:
         karten = ''.join(f'<article class="karte karte-oben {farbe}"><div class="karte-text"><h3>{n}</h3><p>{b}</p>'
-                         f'<div class="knoepfe">{partnerlink(amazon_suche(s), "View on Amazon.de")}</div></div></article>'
+                         f'<div class="knoepfe">{partnerlink(amazon_ziel(s), "View on Amazon.de")}</div></div></article>'
                          for n, b, s in eintraege)
         out.append(f'<section class="abschnitt"><div class="huelle"><div class="kopf-abschnitt"><h2>{titel}</h2><p>{text}</p></div>'
                    f'<div class="karten drei">{karten}</div></div></section>')
@@ -1180,7 +1188,7 @@ EMPF_EN = f'''<main>
   <div>
     <p class="marke">Recommendations</p>
     <h1>What goes with our pieces</h1>
-    <p class="einleitung">Accessories we use ourselves or that go with our prints. The links lead to a search on Amazon.de, so you can compare for yourself.</p>
+    <p class="einleitung">Accessories we use ourselves or that go with our prints. Most links lead to a search on Amazon.de, so you can compare for yourself.</p>
     <p class="partner-hinweis">All links marked with * are affiliate links. As an Amazon Associate we earn from qualifying purchases. If you buy through them, we receive a small commission. The price stays the same for you. More in our <a href="../datenschutz.html#partnerprogramm" hreflang="de">privacy policy (German)</a>.</p>
   </div>
   <div class="bett">{KLANG_EN}</div>
