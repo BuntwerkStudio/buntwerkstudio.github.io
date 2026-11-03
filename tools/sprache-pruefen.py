@@ -6,7 +6,7 @@
 import glob, os, re, sys
 
 ZIEL = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BASIS = 'https://buntwerkstudio.github.io/'
+BASIS = 'https://buntwerkstudio.de/'
 fehler = []
 
 
