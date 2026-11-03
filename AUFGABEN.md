@@ -6,16 +6,17 @@ Status: `[ ]` offen, `[x]` erledigt. So wird die Liste abgearbeitet: `README.md`
 
 - [x] **A1 Amazon-Partner-ID** (18.10.2026): `affiliatesy0e-21` in `js/partner.js`.
 - [x] **A2 Website im PartnerNet hinterlegen** (19.10.2026, geprüft: steht in der Liste neben Pinterest): partnernet.amazon.de → Konto → „Konto-Einstellungen“ → „Websites und mobile Apps bearbeiten“ → `https://buntwerkstudio.github.io` hinzufügen.
-- [ ] **A3 Google Search Console:** search.google.com/search-console → „Property hinzufügen“ → URL-Präfix `https://buntwerkstudio.github.io/` → Bestätigung „HTML-Tag“ wählen und den Tag Claude schicken (dann B1).
-- [ ] **A4 Zurückverlinken:** in den KDP-Büchern (Impressumsseite) und auf der Amazon-Autorenseite (author.amazon.de) auf https://buntwerkstudio.github.io/ verlinken.
-- [ ] **A5 Eigene Domain (optional),** z. B. buntwerkstudio.de. Danach B2.
+- [ ] **A3 Google Search Console:** search.google.com/search-console → „Property hinzufügen“ → URL-Präfix `https://buntwerkstudio.de/` (alternativ „Domain“-Property `buntwerkstudio.de`, Bestätigung über DNS beim Domain-Anbieter) → Bestätigung „HTML-Tag“ wählen und den Tag Claude schicken (dann B1).
+- [ ] **A4 Zurückverlinken:** in den KDP-Büchern (Impressumsseite) und auf der Amazon-Autorenseite (author.amazon.de) auf https://buntwerkstudio.de/ verlinken.
+- [x] **A5 Eigene Domain** (erledigt: buntwerkstudio.de, Stand 03.11.2026). Danach B2.
+- [ ] **A6 Neue Adresse im Amazon-PartnerNet ergänzen** (angelegt 03.11.2026): partnernet.amazon.de → Konto → „Konto-Einstellungen“ → „Websites und mobile Apps bearbeiten“ → `https://buntwerkstudio.de` hinzufügen (die alte Adresse stehen lassen). Außerdem prüfen, ob www.buntwerkstudio.com wirklich auf buntwerkstudio.de weiterleitet (im Browser eintippen).
 - [ ] **A6 Rechtstexte prüfen lassen,** zusammen mit Klangform und Wegform.
 - [ ] **A7 Neue Adresse nach dem Umzug** an Claude geben (dann B3).
 
 ## Phase B – Aufgaben für Claude Code
 
 - [ ] **B1 Bestätigungs-Tag der Search Console einbauen** (erst nach A3): Tag in `tools/seiten-bauen.py` in den Kopf von `index.html`, neu bauen, pushen. Danach Robert sagen: in der Search Console „Bestätigen“ klicken, unter „Sitemaps“ `sitemap.xml` einreichen.
-- [ ] **B2 Eigene Domain einrichten** (erst nach A5): `CNAME`, Canonical-Adressen, `sitemap.xml`, `robots.txt`, Impressum, Datenschutz, Links in Klangform und Wegform.
+- [x] **B2 Eigene Domain einrichten** (03.11.2026 erledigt, Wunsch Robert: „Wir sind jetzt www.BuntwerkStudio.de“): `CNAME` `buntwerkstudio.de` (ohne Punkt am Ende, geprüft), buntwerkstudio.github.io und www.buntwerkstudio.de leiten auf https://buntwerkstudio.de weiter (geprüft 03.11.2026). `BASIS` in `tools/seiten-bauen.py` und `tools/sprache-pruefen.py` auf https://buntwerkstudio.de/ (Canonical, hreflang, og:url, JSON-LD, `sitemap.xml`, `robots.txt`), Datenschutz-Satz „gilt für …“ angepasst (Stand 03.11.2026), alle Seiten neu gebaut, Sprach-Prüfung bestanden. Kopfzeile, Fuß und Rechtstexte in Klangform und Wegform auf `entwicklung` umgestellt (kommen mit der nächsten Veröffentlichung live, bis dahin leitet die alte Adresse weiter). www.buntwerkstudio.com konnte von hier nicht geprüft werden.
 - [ ] **B3 Neue Adresse überall eintragen** (erst nach A7): Website, Klangform und Wegform (Impressum, AGB, Datenschutz, Widerruf, Bestellbestätigungen in `js/kauf.js`, `ARBEITSWEISE.md`). Klangform/Wegform nur auf `entwicklung`, dann fragen, ob veröffentlicht werden soll.
 - [x] **B4 Rücklink im Fuß von Klangform und Wegform** (19.10.2026 erledigt, liegt auf `entwicklung`, kommt mit der nächsten Veröffentlichung live; dazu die BuntwerkStudio-Kopfzeile oben) auf https://buntwerkstudio.github.io/ (auf `entwicklung`, mit der nächsten Veröffentlichung live).
 - [ ] **B5 Neue Bücher** einbauen, sobald Robert Titel nennt: Umschlag und ASIN aus dem KDP-Bücherregal (Chrome), Eintrag in `BUCHLISTE`, neu bauen.

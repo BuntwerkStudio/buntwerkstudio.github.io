@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Erzeugt die statischen Seiten für buntwerkstudio.github.io (einmalig, Ergebnis wird committet)."""
+"""Erzeugt die statischen Seiten für buntwerkstudio.de (GitHub Pages, früher buntwerkstudio.github.io) (einmalig, Ergebnis wird committet)."""
 import json, math, os, posixpath, random, tempfile
 
 ZIEL = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BASIS = 'https://buntwerkstudio.github.io/'
+BASIS = 'https://buntwerkstudio.de/'
 KLANGFORM = 'https://klangform.netlify.app/'
 WEGFORM = 'https://tracks-and-trails.netlify.app/'
-STAND = '18.10.2026'
-GEAENDERT = '2026-10-24'   # lastmod in sitemap.xml
+STAND = '03.11.2026'
+GEAENDERT = '2026-11-03'   # lastmod in sitemap.xml
 # Wie SHOP.druckVerfuegbar in Klangform (js/config.js). False = gedruckte Teile ausverkauft, nur STL-Datei bestellbar.
 DRUCK_VERFUEGBAR = False
 HINWEIS_AUSVERKAUFT = '' if DRUCK_VERFUEGBAR else '<div class="kasten"><p><strong>Gerade ausverkauft:</strong> Fertig gedruckte Teile können wir im Moment nicht liefern. Die Druckdatei (STL) zum Selbstdrucken bekommst du weiter für 2 € per E-Mail.</p></div>'
@@ -798,7 +798,7 @@ seite('impressum.html', 'Impressum – BuntwerkStudio', 'Impressum von BuntwerkS
 
 DATENSCHUTZ = f'''<main class="textseite">
   <h1>Datenschutz</h1>
-  <p class="leise">Diese Erklärung gilt für buntwerkstudio.github.io. Stand: {STAND}.</p>
+  <p class="leise">Diese Erklärung gilt für buntwerkstudio.de (auch über www.buntwerkstudio.de und die frühere Adresse buntwerkstudio.github.io erreichbar). Stand: {STAND}.</p>
 
   <h2>1. Verantwortlich</h2>
   <p>BuntwerkStudio<br>Inhaber: Robert Maximilian Maahs<br>Zum Fuchsbau 7<br>48346 Ostbevern<br>Deutschland<br>E-Mail: <a href="mailto:buntwerkstudio@gmail.com">buntwerkstudio@gmail.com</a></p>
