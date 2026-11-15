@@ -12,6 +12,9 @@ Status: `[ ]` offen, `[x]` erledigt. So wird die Liste abgearbeitet: `README.md`
 - [ ] **A6 Neue Adresse im Amazon-PartnerNet ergänzen** (angelegt 03.11.2026): partnernet.amazon.de → Konto → „Konto-Einstellungen“ → „Websites und mobile Apps bearbeiten“ → `https://buntwerkstudio.de` hinzufügen (die alte Adresse stehen lassen). Außerdem prüfen, ob www.buntwerkstudio.com wirklich auf buntwerkstudio.de weiterleitet (im Browser eintippen).
 - [ ] **A6 Rechtstexte prüfen lassen,** zusammen mit Klangform und Wegform.
 - [ ] **A7 Neue Adresse nach dem Umzug** an Claude geben (dann B3).
+- [ ] **A8 Fotos der gedruckten Reliefs liefern** (angelegt 15.11.2026, Ergebnis der Standortbewertung: auf der ganzen Website gibt es kein Foto eines echten Reliefs oder Anhängers, nur Buchumschläge; für ein Geschenk für 40–90 € kauft niemand ohne Foto): 2–3 beste Fotos aus Wegform A7b (Relief mit Grundplatte von vorn, Relief in der Hand, Anhänger) und 1–2 Klangform-Fotos nach `img/` legen (WebP oder JPG, 1600 px breit) oder an Claude geben. Dann B9.
+- [ ] **A9 Search Console einrichten** = A3 (wichtigster kostenloser Schritt für Sichtbarkeit: Stand 15.11.2026 findet eine Suche nach „buntwerkstudio“ die Seite nicht). Nach A3 sofort B1, dann in der Search Console „Sitemaps“ → `https://buntwerkstudio.de/sitemap.xml` eintragen.
+- [ ] **A10 Wegform-Preise festlegen** (= Wegform A1b). Solange sie Platzhalter sind, nennt die Website keine Wegform-Preise (feste Regel 3 in `CLAUDE.md`). Erst danach B9 Schritt 2 mit Preisen.
 
 ## Phase B – Aufgaben für Claude Code
 
@@ -28,3 +31,18 @@ Status: `[ ]` offen, `[x]` erledigt. So wird die Liste abgearbeitet: `README.md`
   3. Die anderen Karten verlinken auf eine Amazon-Suche (`amazon_suche`). Diese Karte verlinkt direkt auf den Artikel: `https://www.amazon.de/dp/<ASIN>` mit `data-amazon`, `rel="sponsored noopener"` und Sternchen (wie `partnerlink`), die Partner-Kennung hängt `js/partner.js` an. Dafür `GRUPPEN`/`gruppen_html()` so erweitern, dass ein Eintrag statt eines Suchbegriffs auch eine ASIN haben kann. Kein Produktbild und kein Preis von Amazon einbinden (Regel 1).
   4. Neu bauen (`python3 tools/seiten-bauen.py`), `sitemap.xml` (`lastmod` der Empfehlungsseite) prüfen, deutsch und englisch, hell, dunkel und 390 px ansehen, Link öffnen und prüfen, dass `tag=affiliatesy0e-21` angehängt ist.
   5. Auf dem Branch `entwicklung` committen (dort liegen schon B6 und B7), mit der nächsten Veröffentlichung nach `main`.
+- [ ] **B9 Fotos und Preisbeispiel auf Start- und Wegform-Seite** (angelegt 15.11.2026 von Robert; erst nach A8, Preise erst nach A10)
+- [ ] **B10 Links auf die Konfiguratoren tauschen** (angelegt 15.11.2026 von Robert; erst wenn Wegform B25 / Klangform B16 veröffentlicht sind): in `tools/seiten-bauen.py` die Links `KLANGFORM` und `WEGFORM` auf `https://klangform.buntwerkstudio.de/` und `https://wegform.buntwerkstudio.de/` umstellen, deutsch und englisch, neu bauen, `python3 tools/sprache-pruefen.py`, `sitemap.xml` prüfen, auf `main` pushen (kostet nichts).
+
+### B9 Fotos und Preisbeispiel auf Start- und Wegform-Seite
+
+Angelegt am 15.11.2026 von Robert nach der Standortbewertung. Die Startseite zeigt für die Bücher Umschläge, für Klangform und Wegform nur Text. Die Wegform-Seite nennt keinen Preis für ein gedrucktes Relief und zeigt kein Foto.
+
+```
+Arbeite B9 ab (Ablauf: README.md, Abschnitt „Aufgaben abarbeiten“). Website-Branch main.
+1. Fotos aus img/ (A8) verkleinern wie die Buchbilder (WebP, dazu eine kleine Fassung fürs Handy, je Datei unter 150 KB), nichts installieren, was nicht da ist – fehlt ein Werkzeug, Robert um verkleinerte Bilder bitten. Keine fremden Bilder, keine KI-Bilder.
+2. tools/seiten-bauen.py: Auf der Startseite in den Bereichen Klangform und Wegform je ein Foto statt nur Text. Auf wanderroute-3d-relief.html eine kleine Galerie (3 Fotos mit Bildunterschrift: Produkt, Variante, Größe). Nur wenn A10 entschieden ist: Abschnitt „Was kostet das?“ mit drei Beispielen (Anhänger, Relief Basis 100 mm, Relief Premium 100 mm mit Grundplatte, Versand) aus Wegform js/config.js, mit dem Hinweis, dass der genaue Preis im Konfigurator steht; Regel 3 in CLAUDE.md und Regel 8 (Preise nachziehen) dann anpassen. Auf schallwelle-anhaenger.html ebenso 1–2 Fotos.
+3. Englische Seiten mitziehen (tools/seiten-bauen.py erzeugt en/), sitemap.xml lastmod, python3 tools/sprache-pruefen.py, hell, dunkel, 390 px prüfen. alt-Text für jedes Bild.
+4. Auf main pushen (kostet nichts), B9 abhaken. In der Rückmeldung: welche Fotos verwendet wurden.
+```
+
