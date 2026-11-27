@@ -1200,6 +1200,59 @@ seite('en/recommendations.html', 'Accessories for sound wave keychains and 3D re
       'Chains, key rings, ribbons, picture ledges and filament: accessories that go with the 3D prints from Klangform and Wegform.',
       EMPF_EN, ld=[kruemel(('en/index.html', 'Home'), ('en/recommendations.html', 'Recommendations'))])
 
+# ---------------------------------------------------------------- Klartag: Bonus-PDFs für die Kindle-Begleitbücher
+# Nur Deutsch, nicht im Menü, nicht in der Sitemap (noindex). Die Kindle-Begleitbücher verlinken auf /klartag.
+
+KLARTAG = [
+    ('mein-klares-jahr', 1, 'Mein klares Jahr', 'Vision Board & Jahresplaner',
+     'Rückblick, Lebensrad, Vision Board, drei Jahresziele, ein Monat und eine Woche zum Ausprobieren.', 19),
+    ('100-tage-klarheit', 2, '100 Tage Klarheit', 'Das Ziel-Journal',
+     'Zielseiten, Meilensteine, Fortschrittskarte, die ersten zehn Tage und eine Reflexion.', 16),
+    ('klarer-kopf', 3, 'Klarer Kopf', 'Der Fokus-Planer, ADHS-freundlich',
+     'Routinen-Baukasten, Belohnungsmenü, Notfallkarte, Wochen-Reset und eine ganze Woche.', 14),
+    ('mein-energiekompass', 4, 'Mein Energiekompass', 'Der Planer für autistische Erwachsene',
+     'Reizprofil, Warnzeichen, Ruhe-Werkzeugkasten, Notfallkarten und eine ganze Woche.', 16),
+]
+
+
+def klartag_karte(kurz, band, titel, unter, text, seiten):
+    return (f'<article class="buch">'
+            f'<img src="img/klartag-{kurz}.webp" alt="Umschlag von „{titel}“" width="302" height="390" loading="lazy">'
+            f'<p class="kennung">Klartag · Band {band}</p>'
+            f'<h3>{titel}</h3><p>{unter}</p><p>{text}</p>'
+            f'<div class="knoepfe"><a class="haupt" href="downloads/klartag-{kurz}-bonus.pdf" download>PDF laden ({seiten} Seiten)</a></div>'
+            f'</article>')
+
+
+KLARTAG_SEITE = f'''<main>
+<section class="huelle held">
+  <div>
+    <p class="marke">Klartag</p>
+    <h1>Deine Bonus-Planer</h1>
+    <p class="einleitung">Danke, dass du ein Klartag-Begleitbuch gelesen hast. Hier findest du die versprochenen Auszüge aus den Planern: farbig, mit Register zum Antippen, für GoodNotes, Notability, Noteshelf, den Kindle Scribe oder zum Ausdrucken.</p>
+    <p>Die PDFs sind nur für deinen persönlichen Gebrauch. Bitte gib sie nicht weiter.</p>
+  </div>
+</section>
+
+<section class="abschnitt"><div class="huelle">
+  <div class="buecher">{''.join(klartag_karte(*k) for k in KLARTAG)}</div>
+</div></section>
+
+<section class="abschnitt"><div class="huelle">
+  <div class="kopf-abschnitt"><h2>So öffnest du das PDF</h2></div>
+  <ol>
+    <li>Tippe auf „PDF laden“ und speichere die Datei.</li>
+    <li>Öffne sie in deiner Notiz-App: in GoodNotes und Notability über „Importieren“, auf dem Kindle Scribe per „Send to Kindle“.</li>
+    <li>Schreib mit dem Stift hinein. Über das Register rechts springst du zwischen den Abschnitten.</li>
+  </ol>
+  <p>Den vollständigen Planer gibt es als Taschenbuch bei Amazon und als digitale Fassung.</p>
+</div></section>
+</main>'''
+
+seite('klartag.html', 'Klartag – Bonus-Planer zum Download | BuntwerkStudio',
+      'Bonus-PDFs zu den Klartag-Begleitbüchern: Auszüge aus Mein klares Jahr, 100 Tage Klarheit, Klarer Kopf und Mein Energiekompass.',
+      KLARTAG_SEITE, index=False, ld=[kruemel(('index.html', 'Start'), ('klartag.html', 'Klartag'))])
+
 # ---------------------------------------------------------------- robots, sitemap
 
 with open(os.path.join(ZIEL, 'robots.txt'), 'w') as f:

@@ -45,7 +45,7 @@ for p in seiten:
             break
         if 'hreflang="de"' not in html or 'hreflang="x-default"' not in html:
             fehler.append(f'{p}: hreflang fehlt')
-    if p not in ('404.html',) and (BASIS + (p[:-10] if p.endswith('index.html') else p)) not in karte:
+    if p not in ('404.html',) and 'noindex' not in html and (BASIS + (p[:-10] if p.endswith('index.html') else p)) not in karte:
         fehler.append(f'{p}: fehlt in sitemap.xml')
     # lokale Ziele
     for ziel in re.findall(r'\b(?:href|src)="([^"#?]+)', html):
