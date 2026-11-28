@@ -93,6 +93,33 @@ p { margin: .5rem 0 0; max-width: 62ch; }
 .menue a:hover { background: var(--flaeche); }
 .menue a[aria-current="page"] { background: var(--tinte); color: var(--grund); }
 
+/* Oberpunkt mit Untermenü, z. B. „Gestalten“ (Aufgabe 2026-11-27_website_menue-gestalten, 28.11.2026) */
+.menue .untermenue { position: relative; background: none; border: 0; border-radius: 0; padding: 0; }
+.menue .untermenue[open] > summary { border-bottom: 0; }
+.menue summary {
+  list-style: none; cursor: pointer; user-select: none;
+  display: inline-flex; align-items: center; gap: .35rem;
+  font-weight: 600; font-size: .95rem; padding: .45rem .8rem; border-radius: 999px;
+}
+.menue summary::-webkit-details-marker { display: none; }
+.menue summary::after {
+  content: ""; width: .42em; height: .42em; margin-top: -.2em;
+  border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+  transform: rotate(45deg); transition: transform .15s;
+}
+.menue details[open] > summary::after { transform: rotate(225deg); margin-top: .2em; }
+.menue summary:hover { background: var(--flaeche); }
+.menue summary.aktiv { background: var(--tinte); color: var(--grund); }
+.menue summary:focus-visible, .menue a:focus-visible { outline: 3px solid var(--aktion); outline-offset: 2px; }
+.menue .untermenue ul {
+  list-style: none; margin: 0; padding: .3rem;
+  position: absolute; top: calc(100% + .3rem); left: 0; z-index: 20; min-width: 11rem;
+  background: var(--flaeche); border: 1.5px solid var(--linie); border-radius: var(--radius-gross);
+  box-shadow: 0 8px 24px rgb(0 0 0 / .12);
+}
+.menue .untermenue li a { display: block; }
+.menue .untermenue li a:hover { background: var(--grund); }
+
 /* ---------- Knöpfe (wie Klangform) ---------- */
 .knoepfe { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.4rem; }
 .haupt, .zweit {
@@ -240,6 +267,9 @@ details p { color: var(--leise); margin: .7rem 0 .9rem; }
   .karten, .karten.drei, .ablauf { grid-template-columns: 1fr; }
   .kopfzeile { flex-direction: column; align-items: flex-start; gap: .6rem; }
   .menue { margin-left: -.8rem; }
+  .menue details.untermenue[open] { flex-basis: 100%; }
+  .menue .untermenue ul { position: static; display: flex; flex-wrap: wrap; gap: .2rem .3rem; min-width: 0; margin: .15rem 0 .2rem 1.2rem; padding: 0; background: none; border: 0; box-shadow: none; }
+  .menue .untermenue li a { display: inline-block; }
   .knoepfe > a { flex: 1 1 auto; justify-content: center; }
   .fuss-raster { grid-template-columns: 1fr; }
 }

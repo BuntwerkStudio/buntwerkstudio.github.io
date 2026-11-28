@@ -110,9 +110,13 @@ BUCH_BILD = svg(buch(110, 70, 130, 190, '#b8312f', -6) + buch(260, 80, 130, 190,
 
 # ---------------------------------------------------------------- Rahmen
 
-MENUE = [('index.html', 'Start'), ('schallwelle-anhaenger.html', 'Klangform'), ('wanderroute-3d-relief.html', 'Wegform'),
+# Hauptmenü. Ein Eintrag mit Liste statt Datei ist ein Oberpunkt mit Untermenü
+# (Aufgabe 2026-11-27_website_menue-gestalten, 28.11.2026: „Gestalten“ / „Create“ mit Klangform und Wegform).
+MENUE = [('index.html', 'Start'),
+         ([('schallwelle-anhaenger.html', 'Klangform'), ('wanderroute-3d-relief.html', 'Wegform')], 'Gestalten'),
          ('buecher.html', 'Bücher'), ('empfehlungen.html', 'Empfehlungen')]
-MENUE_EN = [('en/index.html', 'Home'), ('en/sound-wave-keychain.html', 'Klangform'), ('en/hiking-route-3d-relief.html', 'Wegform'),
+MENUE_EN = [('en/index.html', 'Home'),
+            ([('en/sound-wave-keychain.html', 'Klangform'), ('en/hiking-route-3d-relief.html', 'Wegform')], 'Create'),
             ('en/books.html', 'Books'), ('en/recommendations.html', 'Recommendations')]
 
 # Englische Seiten (Aufgabe B7 = Klangform B13 = Wegform B19, entschieden 24.10.2026): nur die Website, eigene Adressen unter /en/.
@@ -149,9 +153,20 @@ def sprachschalter(datei):
     return f'<nav class="sprache" aria-label="Sprache / Language">{teile[0]}<span aria-hidden="true">|</span>{teile[1]}</nav>'
 
 
+def menuepunkt(datei, ziel, name):
+    """Ein Menüpunkt. Ist „ziel“ eine Liste, wird es ein Oberpunkt mit Untermenü (<details>, geht auch ohne JavaScript;
+    js/menue.js ergänzt Esc, Schließen beim Klick daneben und aria-expanded)."""
+    if isinstance(ziel, str):
+        return f'<a href="{rel(datei, ziel)}"{" aria-current=\"page\"" if ziel == datei else ""}>{name}</a>'
+    aktiv = any(d == datei for d, _ in ziel)
+    unter = ''.join(f'<li><a href="{rel(datei, d)}"{" aria-current=\"page\"" if d == datei else ""}>{n}</a></li>' for d, n in ziel)
+    return (f'<details class="untermenue"><summary{" class=\"aktiv\"" if aktiv else ""} aria-expanded="false">{name}</summary>'
+            f'<ul>{unter}</ul></details>')
+
+
 def kopf(datei):
     en = englisch(datei)
-    links = ''.join(f'<a href="{rel(datei, d)}"{" aria-current=\"page\"" if d == datei else ""}>{n}</a>' for d, n in (MENUE_EN if en else MENUE))
+    links = ''.join(menuepunkt(datei, d, n) for d, n in (MENUE_EN if en else MENUE))
     start = rel(datei, 'en/index.html' if en else 'index.html')
     return (f'<header class="huelle kopfzeile"><a class="wortmarke" href="{start}" aria-label="BuntwerkStudio – {"Home" if en else "Startseite"}">{LOGO}'
             f'<span>Buntwerk<b>Studio</b></span></a><nav class="menue" aria-label="{"Main menu" if en else "Hauptmenü"}">{links}</nav>{sprachschalter(datei)}</header>')
@@ -247,6 +262,7 @@ def seite(datei, titel, beschreibung, inhalt, ld=None, index=True, og_typ='websi
 {FUSS_EN if en else FUSS}
 <script src="{pre}js/partner.js" defer></script>
 <script src="{pre}js/sprache.js" defer></script>
+<script src="{pre}js/menue.js" defer></script>
 </body>
 </html>
 '''
